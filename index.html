@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام هُمام - تحليل سلوك الطلاب</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* الأنماط السابقة تبقى كما هي */
+        /* ... */
+        
+        .risk-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .risk-table th {
+            background-color: var(--warning-color);
+            color: white;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .risk-table td {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .implementation-phase {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-right: 4px solid var(--info-color);
+        }
+        
+        .phase-title {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .policy-section {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--success-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- شريط التنقل -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <span class="humam-logo">هُمام</span>
+                نظام تحليل سلوك الطلاب
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-page="dashboard">لوحة التحكم</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://www.classdojo.com" target="_blank">ClassDojo</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="reports">تقارير أولياء الأمور</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="plans">خطط الدعم الفردي</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="students-list">قائمة الطلاب</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="teachers">المعلمين</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="initiative-details">تفاصيل المبادرة</a>
+                    </li>
+                </ul>
+                <span class="navbar-text">
+                    آخر تحديث: <span id="current-date"></span>
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- لوحة التحكم -->
+        <div id="dashboard" class="page-section active">
+            <!-- قسم مبادرة هُمام -->
+            <div class="initiative-highlight">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h4>مبادرة هُمام: همزة الوصل بين الأسرة والمدرسة</h4>
+                        <p class="mb-0">مبادرة رقمية تهدف إلى رفع التحصيل الدراسي وتعزيز السلوك الإيجابي من خلال تواصل فعال مع أولياء الأمور باستخدام أدوات رقمية مثل ClassDojo.</p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="mt-2">
+                            <span class="goal-badge">الهدف: خفض المخالفات السلوكية ٣٢٪</span>
+                            <span class="goal-badge">رفع التحصيل الدراسي ١٠+ نقاط</span>
+                            <span class="goal-badge">مشاركة أولياء الأمور ٨٥٪</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- أهداف المبادرة -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            أهداف مبادرة هُمام ومؤشرات الأداء (SMART)
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="objective-card">
+                                        <h5>خفض المخالفات السلوكية</h5>
+                                        <p>الهدف: خفض حالات المخالفات السلوكية المسجلة لدى الطلاب المستهدفين بنسبة ٣٢٪</p>
+                                        <div class="objective-progress">
+                                            <div class="objective-progress-bar bg-success" style="width: 85%"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>الإنجاز: 85%</span>
+                                            <span>المستهدف: 100%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="objective-card">
+                                        <h5>رفع التحصيل الدراسي</h5>
+                                        <p>الهدف: رفع متوسط درجات الطلبة المتعثرين بمقدار ١٠+ نقاط على الأقل</p>
+                                        <div class="objective-progress">
+                                            <div class="objective-progress-bar bg-info" style="width: 92%"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>الإنجاز: 9.2 نقاط</span>
+                                            <span>المستهدف: 10+ نقاط</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="objective-card">
+                                        <h5>مشاركة أولياء الأمور</h5>
+                                        <p>الهدف: تسجيل ٨٥٪ من أولياء أمور الطلبة المستهدفين على ClassDojo</p>
+                                        <div class="objective-progress">
+                                            <div class="objective-progress-bar bg-warning" style="width: 78%"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>الإنجاز: 78%</span>
+                                            <span>المستهدف: 85%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="objective-card">
+                                        <h5>استجابة أولياء الأمور</h5>
+                                        <p>الهدف: تحقيق نسبة استجابة أسرية ٧٢٪ للرسائل خلال ٢٤ ساعة</p>
+                                        <div class="objective-progress">
+                                            <div class="objective-progress-bar bg-primary" style="width: 90%"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>الإنجاز: 18 ساعة</span>
+                                            <span>المستهدف: 24 ساعة</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- باقي محتوى لوحة التحكم يبقى كما هو -->
+            <!-- ... -->
+        </div>
+
+        <!-- صفحة تفاصيل المبادرة -->
+        <div id="initiative-details" class="page-section">
+            <div class="card">
+                <div class="card-header">
+                    تفاصيل مبادرة هُمام - إطار العمل الشامل
+                </div>
+                <div class="card-body">
+                    <!-- المشكلة والحاجة -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h5>المشكلة والحاجة</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul>
+                                <li>فجوة تواصل مستمرة بين المدرسة وأولياء الأمور بسبب طبيعة جداول العمل الصناعية</li>
+                                <li>الحاجة إلى قناة رقمية موحدة تنقل التقارير السلوكية والتحصيلية وتمكن المتابعة الفورية دون حضور</li>
+                                <li>الحد من المتابعة الفعالة للأداء والتحصيل والسلوك</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- الفئة المستهدفة -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5>الفئة المستهدفة</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>المستفيدون الأساسيون:</h6>
+                                    <ul>
+                                        <li>طلاب الصف الأول الثانوي المعروفين دراسياً</li>
+                                        <li>طلاب المستوى المنخفض لرفع المستوى وتعزيز نقاط القوة</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>المستفيدون الثانويون:</h6>
+                                    <ul>
+                                        <li>أولياء أمور الطلبة المستهدفين</li>
+                                        <li>معلمو الصف الأول الثانوي، والمرشد الطلابي، وإدارة المدرسة</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- خطة التنفيذ -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5>خطة العمل ومراحل التنفيذ</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="implementation-phase">
+                                <div class="phase-title">المرحلة الأولى - التجهيز (الأسبوع 1-2)</div>
+                                <ul>
+                                    <li>إعداد الحسابات والقنوات الرقمية</li>
+                                    <li>إعداد حقول البيانات وأسماء الطلاب</li>
+                                    <li>تدريب المعلمين على سياسات الاتصال والرسائل البناءة</li>
+                                </ul>
+                            </div>
+                            <div class="implementation-phase">
+                                <div class="phase-title">المرحلة الثانية - التشغيل التجريبي (الأسبوع 3-4)</div>
+                                <ul>
+                                    <li>تطبيق داخل الفصول وتسجيل الملاحظات داخلياً</li>
+                                    <li>ضبط المعايير والسياسات</li>
+                                </ul>
+                            </div>
+                            <div class="implementation-phase">
+                                <div class="phase-title">المرحلة الثالثة - التقارير الأولية (منتصف الفصل)</div>
+                                <ul>
+                                    <li>استخراج تقارير التقدم</li>
+                                    <li>تحديد قائمة الطلبة المستهدفين بدقة</li>
+                                </ul>
+                            </div>
+                            <div class="implementation-phase">
+                                <div class="phase-title">المرحلة الرابعة - إشراك ولي الأمر (الأسبوع 5-6)</div>
+                                <ul>
+                                    <li>دعوة أولياء الأمور للانضمام والمتابعة المباشرة</li>
+                                    <li>تحديد مستهدفات فردية لكل طالب</li>
+                                </ul>
+                            </div>
+                            <div class="implementation-phase">
+                                <div class="phase-title">المرحلة الخامسة - التقييم الختامي (نهاية الفصل)</div>
+                                <ul>
+                                    <li>تقرير ختامي يُظهر التحسّن بالأرقام</li>
+                                    <li>توصيات للفصل التالي</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- مؤشرات الأداء -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5>مؤشرات الأداء الرئيسية (KPIs)</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>المؤشر</th>
+                                            <th>خط الأساس</th>
+                                            <th>المستهدف</th>
+                                            <th>أداة القياس</th>
+                                            <th>وتيرة القياس</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>نسبة أولياء الأمور المسجلين والفاعلين</td>
+                                            <td>2%</td>
+                                            <td>85%</td>
+                                            <td>لوحة ClassDojo</td>
+                                            <td>أسبوعي</td>
+                                        </tr>
+                                        <tr>
+                                            <td>متوسط درجات المتعثرين</td>
+                                            <td>تقرير منتصف الفصل</td>
+                                            <td>10+ نقطة زيادة</td>
+                                            <td>نظام الدرجات المدرسي</td>
+                                            <td>منتصف ونهاية الفصل</td>
+                                        </tr>
+                                        <tr>
+                                            <td>معدل الحوادث السلوكية</td>
+                                            <td>متوسط آخر فصل/أول 3 أسابيع</td>
+                                            <td>30% تخفيض</td>
+                                            <td>سجلات الانضباط + المنصة</td>
+                                            <td>شهري</td>
+                                        </tr>
+                                        <tr>
+                                            <td>زمن استجابة الأسرة</td>
+                                            <td>فصل دراسي</td>
+                                            <td>24 ساعة</td>
+                                            <td>سجلات الرسائل</td>
+                                            <td>أسبوعي</td>
+                                        </tr>
+                                        <tr>
+                                            <td>رضا المعلمين والأسر</td>
+                                            <td>بداية الفصل</td>
+                                            <td>80%</td>
+                                            <td>استبيان ثقتان قصير</td>
+                                            <td>نهاية الفصل</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- السياسة التربوية -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-secondary text-white">
+                            <h5>السياسة التربوية لاستخدام الأداة</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="policy-section">
+                                <h6>التركيز على التعزيز البناء لا "العقاب الرقمي"</h6>
+                                <ul>
+                                    <li>عدم إظهار سجلات السلوك كمؤشرات تصنيفية علنية للطلاب</li>
+                                    <li>استخدام التغذية الراجعة الخاصة</li>
+                                    <li>اعتماد رسائل موجهة تدعم "التنظيم الذاتي" لدى المتعلمين</li>
+                                    <li>عدم الاقتصار على نقاط/خصم</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- إدارة المخاطر -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-danger text-white">
+                            <h5>إدارة المخاطر وخطة التخفيف</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="risk-table">
+                                    <thead>
+                                        <tr>
+                                            <th>الخطر</th>
+                                            <th>التأثير</th>
+                                            <th>خطة التخفيف</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>انخفاض مشاركة أولياء الأمور</td>
+                                            <td>تأخر التحسن</td>
+                                            <td>رسائل موجزة توعوية + فيديوهات قصيرة + بدائل ورقية عند اللازم</td>
+                                        </tr>
+                                        <tr>
+                                            <td>الإفراط في "النقاط السلوكية"</td>
+                                            <td>إحباط</td>
+                                            <td>نموذج تغذية راجعة بناءة، وإخفاء التصنيفات العلنية، ومراجعات شهرية للجودة</td>
+                                        </tr>
+                                        <tr>
+                                            <td>مخاطر الخصوصية</td>
+                                            <td>قانونية</td>
+                                            <td>إشعارات خصوصية، صلاحيات دقيقة، وعدم نقل بيانات إلا بضمانات PDPL</td>
+                                        </tr>
+                                        <tr>
+                                            <td>عبء إضافي على المعلم</td>
+                                            <td>إجهاد</td>
+                                            <td>قوالب رسائل جاهزة، جدولة أسبوعية، وتكامل مع خطط الدروس</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- خطط الدعم الجماعية -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5>خطط الدعم الجماعية</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h6>برنامج تحسين السلوك الصفي</h6>
+                                            <p>جلسات أسبوعية جماعية تركز على:</p>
+                                            <ul>
+                                                <li>مهارات التواصل الفعال</li>
+                                                <li>إدارة الوقت والانضباط الذاتي</li>
+                                                <li>التعاون والعمل الجماعي</li>
+                                            </ul>
+                                            <span class="badge bg-primary">مدة البرنامج: 6 أسابيع</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h6>ورشة أولياء الأمور</h6>
+                                            <p>جلسات توعوية لأولياء الأمور تشمل:</p>
+                                            <ul>
+                                                <li>كيفية استخدام ClassDojo</li>
+                                                <li>استراتيجيات دعم الأبناء دراسياً</li>
+                                                <li>التعامل مع المشكلات السلوكية</li>
+                                            </ul>
+                                            <span class="badge bg-primary">مدة الورشة: 4 جلسات</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h6>برنامج التحصيل الدراسي</h6>
+                                            <p>جلسات دعم دراسي جماعي:</p>
+                                            <ul>
+                                                <li>مراجعة المواد الدراسية الأساسية</li>
+                                                <li>تعلم استراتيجيات المذاكرة الفعالة</li>
+                                                <li>تدريبات حل المشكلات</li>
+                                            </ul>
+                                            <span class="badge bg-primary">مدة البرنامج: 8 أسابيع</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <h6>نادي المهارات الحياتية</h6>
+                                            <p>أنشطة لتعزيز المهارات الشخصية:</p>
+                                            <ul>
+                                                <li>مهارات القيادة</li>
+                                                <li>التفكير الإبداعي</li>
+                                                <li>حل المشكلات</li>
+                                            </ul>
+                                            <span class="badge bg-primary">مدة النادي: فصل دراسي</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- صفحة خطط الدعم الفردي - تم تحديثها -->
+        <div id="plans" class="page-section">
+            <div class="card">
+                <div class="card-header">
+                    خطط الدعم الفردي والجماعي للطلاب
+                </div>
+                <div class="card-body">
+                    <!-- خطط الدعم الفردي -->
+                    <div class="plan-section mb-4">
+                        <h5>نموذج الخطة العلاجية الفردية</h5>
+                        <p>تم تصميم هذا النموذج لدعم الطلاب الذين يحتاجون إلى متابعة فردية لتحسين تحصيلهم الدراسي وسلوكهم.</p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">اسم الطالب:</label>
+                                    <select class="form-select" id="student-name">
+                                        <option value="">اختر الطالب</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">الصف:</label>
+                                    <input type="text" class="form-control" value="الأول الثانوي" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">نوع الخطة:</label>
+                                    <select class="form-select" id="plan-type">
+                                        <option value="behavioral">تحسين سلوكي</option>
+                                        <option value="academic">تحصيل دراسي</option>
+                                        <option value="comprehensive">شاملة (سلوكي ودراسي)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">المادة:</label>
+                                    <select class="form-select" id="subject">
+                                        <option value="chemistry">كيمياء - عبدالله محمد حمدي</option>
+                                        <option value="math">رياضيات - عبدالعزيز عايض القحطاني</option>
+                                        <option value="biology">أحياء - عبدالرحمن عبدالله الغامدي</option>
+                                        <option value="english">انجليزي - فهد ابراهيم المحبوب</option>
+                                        <option value="language">الكفايات اللغوية - محمد أحمد العميري</option>
+                                        <option value="technology">التقنية الرقمية - فارس سعيد الغامدي</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">المعلم المسؤول:</label>
+                                    <input type="text" class="form-control" id="teacher-name" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">الخطوات المقترحة للعلاج:</label>
+                            <textarea class="form-control" id="treatment-steps" rows="4" placeholder="ادخل الخطوات المقترحة للعلاج..."></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">مؤشرات التقدم:</label>
+                            <textarea class="form-control" id="progress-indicators" rows="3" placeholder="ادخل مؤشرات التقدم المتوقعة..."></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">الجدول الزمني:</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <input type="date" class="form-control" id="start-date">
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="date" class="form-control" id="end-date">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">توقيع ولي الأمر:</label>
+                                    <input type="text" class="form-control" id="parent-signature" placeholder="توقيع ولي الأمر">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">توقيع المرشد الطلابي:</label>
+                                    <input type="text" class="form-control" value="منصور موسى حامظي" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="save-plan">حفظ الخطة</button>
+                        <button class="btn btn-outline-secondary me-2" id="print-plan">طباعة النموذج</button>
+                        <button class="btn btn-success me-2" id="assign-group-plan">إضافة لخطة جماعية</button>
+                    </div>
+                    
+                    <!-- خطط الدعم الجماعية -->
+                    <div class="plan-section">
+                        <h5>خطط الدعم الجماعية المتاحة</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6>برنامج تحسين السلوك الصفي</h6>
+                                        <p class="card-text">جلسات أسبوعية لتحسين السلوك الصفي ومهارات التواصل.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-primary">6 أسابيع</span>
+                                            <button class="btn btn-sm btn-outline-primary assign-btn" data-plan="behavior">تعيين طلاب</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6>برنامج التحصيل الدراسي</h6>
+                                        <p class="card-text">جلسات دعم دراسي جماعي لتحسين المستوى الأكاديمي.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-primary">8 أسابيع</span>
+                                            <button class="btn btn-sm btn-outline-primary assign-btn" data-plan="academic">تعيين طلاب</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6>نادي المهارات الحياتية</h6>
+                                        <p class="card-text">أنشطة لتعزيز المهارات الشخصية والقيادية.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-primary">فصل دراسي</span>
+                                            <button class="btn btn-sm btn-outline-primary assign-btn" data-plan="life-skills">تعيين طلاب</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <h6>ورشة أولياء الأمور</h6>
+                                        <p class="card-text">جلسات توعوية لأولياء الأمور حول دعم الأبناء.</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="badge bg-primary">4 جلسات</span>
+                                            <button class="btn btn-sm btn-outline-primary assign-btn" data-plan="parent-workshop">تعيين أسر</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- باقي الصفحات تبقى كما هي -->
+        <!-- ... -->
+    </div>
+
+    <!-- الأكواد البرمجية الأخرى تبقى كما هي -->
+    <!-- ... -->
+
+    <script>
+        // إضافة دالة لتعيين الطلاب لخطط جماعية
+        document.querySelectorAll('.assign-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const planType = this.getAttribute('data-plan');
+                const planNames = {
+                    'behavior': 'برنامج تحسين السلوك الصفي',
+                    'academic': 'برنامج التحصيل الدراسي',
+                    'life-skills': 'نادي المهارات الحياتية',
+                    'parent-workshop': 'ورشة أولياء الأمور'
+                };
+                
+                // هنا يمكنك إضافة كود لفتح نافذة لاختيار الطلاب
+                alert(`سيتم فتح نافذة لتعيين الطلاب لـ ${planNames[planType]}`);
+            });
+        });
+
+        // تحديث اسم المعلم عند تغيير المادة
+        document.getElementById('subject').addEventListener('change', function() {
+            const teachers = {
+                'chemistry': 'عبدالله محمد حمدي',
+                'math': 'عبدالعزيز عايض القحطاني',
+                'biology': 'عبدالرحمن عبدالله الغامدي',
+                'english': 'فهد ابراهيم المحبوب',
+                'language': 'محمد أحمد العميري',
+                'technology': 'فارس سعيد الغامدي'
+            };
+            
+            document.getElementById('teacher-name').value = teachers[this.value];
+        });
+
+        // إضافة طالب لخطة جماعية
+        document.getElementById('assign-group-plan').addEventListener('click', function() {
+            const studentIndex = document.getElementById('student-name').value;
+            if (!studentIndex) {
+                alert('يرجى اختيار طالب أولاً');
+                return;
+            }
+            
+            // هنا يمكنك إضافة كود لتعيين الطالب لخطة جماعية
+            alert('سيتم فتح نافذة لاختيار الخطة الجماعية المناسبة للطالب');
+        });
+
+        // باقي الأكواد البرمجية تبقى كما هي
+        // ...
+    </script>
+</body>
+</html>
