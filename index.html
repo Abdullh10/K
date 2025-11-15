@@ -3,680 +3,1058 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام هُمام - تحليل سلوك الطلاب</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>مسابقة التفاعلات الكيميائية - وزارة التعليم</title>
     <style>
-        /* الأنماط السابقة تبقى كما هي */
-        /* ... */
-        
-        .risk-table {
-            width: 100%;
-            border-collapse: collapse;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        .risk-table th {
-            background-color: var(--warning-color);
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 95%;
+            max-width: 1000px;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
             color: white;
-            padding: 12px;
+            padding: 25px;
             text-align: center;
+            position: relative;
         }
         
-        .risk-table td {
-            padding: 10px;
-            border: 1px solid var(--border-color);
-        }
-        
-        .implementation-phase {
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-right: 4px solid var(--info-color);
-        }
-        
-        .phase-title {
-            font-weight: bold;
-            color: var(--primary-color);
+        .header h1 {
+            font-size: 28px;
             margin-bottom: 10px;
         }
         
-        .policy-section {
-            background-color: #f9f9f9;
-            border-radius: 8px;
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #1a2a6c;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        
+        .progress-container {
+            background: #f0f0f0;
+            height: 10px;
+            width: 100%;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .quiz-content {
+            padding: 30px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .question-container {
+            margin-bottom: 30px;
+        }
+        
+        .question-number {
+            font-size: 14px;
+            color: #b21f1f;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .question {
+            font-size: 20px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
             padding: 15px;
-            margin-bottom: 15px;
-            border-left: 4px solid var(--success-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .option:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .option.selected {
+            background: #d4edda;
+            border-color: #1a2a6c;
+        }
+        
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+        
+        .option-letter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background: #1a2a6c;
+            color: white;
+            border-radius: 50%;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        button {
+            background: linear-gradient(to right, #1a2a6c, #b21f1f);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .result-container {
+            text-align: center;
+            padding: 40px 20px;
+            display: none;
+        }
+        
+        .result-title {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #1a2a6c;
+        }
+        
+        .score {
+            font-size: 72px;
+            font-weight: bold;
+            color: #b21f1f;
+            margin: 20px 0;
+        }
+        
+        .score-text {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        
+        .feedback {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: right;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .timer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        .medal {
+            font-size: 80px;
+            margin: 20px 0;
+        }
+        
+        .question-jump {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .question-jump-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .question-jump-btn:hover {
+            background: #dee2e6;
+        }
+        
+        .question-jump-btn.answered {
+            background: #1a2a6c;
+            color: white;
+        }
+        
+        .question-jump-btn.current {
+            background: #b21f1f;
+            color: white;
+        }
+        
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .question {
+                font-size: 18px;
+            }
+            
+            .quiz-content {
+                padding: 20px;
+            }
+            
+            .medal {
+                font-size: 60px;
+            }
+            
+            .question-jump-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 1s infinite;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1a2a6c;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #6c757d;
         }
     </style>
 </head>
 <body>
-    <!-- شريط التنقل -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="#">
-                <span class="humam-logo">هُمام</span>
-                نظام تحليل سلوك الطلاب
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#" data-page="dashboard">لوحة التحكم</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="https://www.classdojo.com" target="_blank">ClassDojo</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-page="reports">تقارير أولياء الأمور</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-page="plans">خطط الدعم الفردي</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-page="students-list">قائمة الطلاب</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-page="teachers">المعلمين</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-page="initiative-details">تفاصيل المبادرة</a>
-                    </li>
-                </ul>
-                <span class="navbar-text">
-                    آخر تحديث: <span id="current-date"></span>
-                </span>
+    <div class="container">
+        <div class="header">
+            <div class="logo">وزارة التعليم</div>
+            <h1>مسابقة التفاعلات الكيميائية</h1>
+            <p>اختبر معرفتك في عالم الكيمياء مع 35 سؤالاً شيقاً!</p>
+            <div class="timer" id="timer">⏱ 30:00</div>
+        </div>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        
+        <div class="quiz-content" id="quiz-content">
+            <div class="question-container">
+                <div class="question-number">السؤال <span id="current-question">1</span> من <span id="total-questions">35</span></div>
+                <div class="question" id="question">ما هو الناتج الرئيسي لتفاعل الاحتراق الكامل للهيدروكربونات؟</div>
+            </div>
+            
+            <div class="options-container" id="options-container">
+                <!-- سيتم ملء الخيارات ديناميكيًا -->
+            </div>
+            
+            <div class="question-jump" id="question-jump">
+                <!-- سيتم ملء أزرار القفز بين الأسئلة ديناميكيًا -->
+            </div>
+            
+            <div class="navigation">
+                <button id="prev-btn" disabled>السابق</button>
+                <button id="next-btn">التالي</button>
+                <button id="submit-btn" style="display: none;">إنهاء المسابقة</button>
             </div>
         </div>
-    </nav>
-
-    <div class="container mt-4">
-        <!-- لوحة التحكم -->
-        <div id="dashboard" class="page-section active">
-            <!-- قسم مبادرة هُمام -->
-            <div class="initiative-highlight">
-                <div class="row">
-                    <div class="col-md-8">
-                        <h4>مبادرة هُمام: همزة الوصل بين الأسرة والمدرسة</h4>
-                        <p class="mb-0">مبادرة رقمية تهدف إلى رفع التحصيل الدراسي وتعزيز السلوك الإيجابي من خلال تواصل فعال مع أولياء الأمور باستخدام أدوات رقمية مثل ClassDojo.</p>
-                    </div>
-                    <div class="col-md-4 text-center">
-                        <div class="mt-2">
-                            <span class="goal-badge">الهدف: خفض المخالفات السلوكية ٣٢٪</span>
-                            <span class="goal-badge">رفع التحصيل الدراسي ١٠+ نقاط</span>
-                            <span class="goal-badge">مشاركة أولياء الأمور ٨٥٪</span>
-                        </div>
-                    </div>
+        
+        <div class="result-container" id="result-container">
+            <h2 class="result-title">نتيجة المسابقة</h2>
+            <div class="medal" id="medal">🥇</div>
+            <div class="score" id="score">0%</div>
+            <p class="score-text" id="score-text">حاول مرة أخرى!</p>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="correct-answers">0</div>
+                    <div class="stat-label">إجابات صحيحة</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="wrong-answers">0</div>
+                    <div class="stat-label">إجابات خاطئة</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="time-taken">0:00</div>
+                    <div class="stat-label">الوقت المستغرق</div>
                 </div>
             </div>
-
-            <!-- أهداف المبادرة -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            أهداف مبادرة هُمام ومؤشرات الأداء (SMART)
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="objective-card">
-                                        <h5>خفض المخالفات السلوكية</h5>
-                                        <p>الهدف: خفض حالات المخالفات السلوكية المسجلة لدى الطلاب المستهدفين بنسبة ٣٢٪</p>
-                                        <div class="objective-progress">
-                                            <div class="objective-progress-bar bg-success" style="width: 85%"></div>
-                                        </div>
-                                        <div class="d-flex justify-content-between">
-                                            <span>الإنجاز: 85%</span>
-                                            <span>المستهدف: 100%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="objective-card">
-                                        <h5>رفع التحصيل الدراسي</h5>
-                                        <p>الهدف: رفع متوسط درجات الطلبة المتعثرين بمقدار ١٠+ نقاط على الأقل</p>
-                                        <div class="objective-progress">
-                                            <div class="objective-progress-bar bg-info" style="width: 92%"></div>
-                                        </div>
-                                        <div class="d-flex justify-content-between">
-                                            <span>الإنجاز: 9.2 نقاط</span>
-                                            <span>المستهدف: 10+ نقاط</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="objective-card">
-                                        <h5>مشاركة أولياء الأمور</h5>
-                                        <p>الهدف: تسجيل ٨٥٪ من أولياء أمور الطلبة المستهدفين على ClassDojo</p>
-                                        <div class="objective-progress">
-                                            <div class="objective-progress-bar bg-warning" style="width: 78%"></div>
-                                        </div>
-                                        <div class="d-flex justify-content-between">
-                                            <span>الإنجاز: 78%</span>
-                                            <span>المستهدف: 85%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="objective-card">
-                                        <h5>استجابة أولياء الأمور</h5>
-                                        <p>الهدف: تحقيق نسبة استجابة أسرية ٧٢٪ للرسائل خلال ٢٤ ساعة</p>
-                                        <div class="objective-progress">
-                                            <div class="objective-progress-bar bg-primary" style="width: 90%"></div>
-                                        </div>
-                                        <div class="d-flex justify-content-between">
-                                            <span>الإنجاز: 18 ساعة</span>
-                                            <span>المستهدف: 24 ساعة</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- باقي محتوى لوحة التحكم يبقى كما هو -->
-            <!-- ... -->
-        </div>
-
-        <!-- صفحة تفاصيل المبادرة -->
-        <div id="initiative-details" class="page-section">
-            <div class="card">
-                <div class="card-header">
-                    تفاصيل مبادرة هُمام - إطار العمل الشامل
-                </div>
-                <div class="card-body">
-                    <!-- المشكلة والحاجة -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-warning text-dark">
-                            <h5>المشكلة والحاجة</h5>
-                        </div>
-                        <div class="card-body">
-                            <ul>
-                                <li>فجوة تواصل مستمرة بين المدرسة وأولياء الأمور بسبب طبيعة جداول العمل الصناعية</li>
-                                <li>الحاجة إلى قناة رقمية موحدة تنقل التقارير السلوكية والتحصيلية وتمكن المتابعة الفورية دون حضور</li>
-                                <li>الحد من المتابعة الفعالة للأداء والتحصيل والسلوك</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- الفئة المستهدفة -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-info text-white">
-                            <h5>الفئة المستهدفة</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h6>المستفيدون الأساسيون:</h6>
-                                    <ul>
-                                        <li>طلاب الصف الأول الثانوي المعروفين دراسياً</li>
-                                        <li>طلاب المستوى المنخفض لرفع المستوى وتعزيز نقاط القوة</li>
-                                    </ul>
-                                </div>
-                                <div class="col-md-6">
-                                    <h6>المستفيدون الثانويون:</h6>
-                                    <ul>
-                                        <li>أولياء أمور الطلبة المستهدفين</li>
-                                        <li>معلمو الصف الأول الثانوي، والمرشد الطلابي، وإدارة المدرسة</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- خطة التنفيذ -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-success text-white">
-                            <h5>خطة العمل ومراحل التنفيذ</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="implementation-phase">
-                                <div class="phase-title">المرحلة الأولى - التجهيز (الأسبوع 1-2)</div>
-                                <ul>
-                                    <li>إعداد الحسابات والقنوات الرقمية</li>
-                                    <li>إعداد حقول البيانات وأسماء الطلاب</li>
-                                    <li>تدريب المعلمين على سياسات الاتصال والرسائل البناءة</li>
-                                </ul>
-                            </div>
-                            <div class="implementation-phase">
-                                <div class="phase-title">المرحلة الثانية - التشغيل التجريبي (الأسبوع 3-4)</div>
-                                <ul>
-                                    <li>تطبيق داخل الفصول وتسجيل الملاحظات داخلياً</li>
-                                    <li>ضبط المعايير والسياسات</li>
-                                </ul>
-                            </div>
-                            <div class="implementation-phase">
-                                <div class="phase-title">المرحلة الثالثة - التقارير الأولية (منتصف الفصل)</div>
-                                <ul>
-                                    <li>استخراج تقارير التقدم</li>
-                                    <li>تحديد قائمة الطلبة المستهدفين بدقة</li>
-                                </ul>
-                            </div>
-                            <div class="implementation-phase">
-                                <div class="phase-title">المرحلة الرابعة - إشراك ولي الأمر (الأسبوع 5-6)</div>
-                                <ul>
-                                    <li>دعوة أولياء الأمور للانضمام والمتابعة المباشرة</li>
-                                    <li>تحديد مستهدفات فردية لكل طالب</li>
-                                </ul>
-                            </div>
-                            <div class="implementation-phase">
-                                <div class="phase-title">المرحلة الخامسة - التقييم الختامي (نهاية الفصل)</div>
-                                <ul>
-                                    <li>تقرير ختامي يُظهر التحسّن بالأرقام</li>
-                                    <li>توصيات للفصل التالي</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- مؤشرات الأداء -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <h5>مؤشرات الأداء الرئيسية (KPIs)</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>المؤشر</th>
-                                            <th>خط الأساس</th>
-                                            <th>المستهدف</th>
-                                            <th>أداة القياس</th>
-                                            <th>وتيرة القياس</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>نسبة أولياء الأمور المسجلين والفاعلين</td>
-                                            <td>2%</td>
-                                            <td>85%</td>
-                                            <td>لوحة ClassDojo</td>
-                                            <td>أسبوعي</td>
-                                        </tr>
-                                        <tr>
-                                            <td>متوسط درجات المتعثرين</td>
-                                            <td>تقرير منتصف الفصل</td>
-                                            <td>10+ نقطة زيادة</td>
-                                            <td>نظام الدرجات المدرسي</td>
-                                            <td>منتصف ونهاية الفصل</td>
-                                        </tr>
-                                        <tr>
-                                            <td>معدل الحوادث السلوكية</td>
-                                            <td>متوسط آخر فصل/أول 3 أسابيع</td>
-                                            <td>30% تخفيض</td>
-                                            <td>سجلات الانضباط + المنصة</td>
-                                            <td>شهري</td>
-                                        </tr>
-                                        <tr>
-                                            <td>زمن استجابة الأسرة</td>
-                                            <td>فصل دراسي</td>
-                                            <td>24 ساعة</td>
-                                            <td>سجلات الرسائل</td>
-                                            <td>أسبوعي</td>
-                                        </tr>
-                                        <tr>
-                                            <td>رضا المعلمين والأسر</td>
-                                            <td>بداية الفصل</td>
-                                            <td>80%</td>
-                                            <td>استبيان ثقتان قصير</td>
-                                            <td>نهاية الفصل</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- السياسة التربوية -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-secondary text-white">
-                            <h5>السياسة التربوية لاستخدام الأداة</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="policy-section">
-                                <h6>التركيز على التعزيز البناء لا "العقاب الرقمي"</h6>
-                                <ul>
-                                    <li>عدم إظهار سجلات السلوك كمؤشرات تصنيفية علنية للطلاب</li>
-                                    <li>استخدام التغذية الراجعة الخاصة</li>
-                                    <li>اعتماد رسائل موجهة تدعم "التنظيم الذاتي" لدى المتعلمين</li>
-                                    <li>عدم الاقتصار على نقاط/خصم</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- إدارة المخاطر -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-danger text-white">
-                            <h5>إدارة المخاطر وخطة التخفيف</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="risk-table">
-                                    <thead>
-                                        <tr>
-                                            <th>الخطر</th>
-                                            <th>التأثير</th>
-                                            <th>خطة التخفيف</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>انخفاض مشاركة أولياء الأمور</td>
-                                            <td>تأخر التحسن</td>
-                                            <td>رسائل موجزة توعوية + فيديوهات قصيرة + بدائل ورقية عند اللازم</td>
-                                        </tr>
-                                        <tr>
-                                            <td>الإفراط في "النقاط السلوكية"</td>
-                                            <td>إحباط</td>
-                                            <td>نموذج تغذية راجعة بناءة، وإخفاء التصنيفات العلنية، ومراجعات شهرية للجودة</td>
-                                        </tr>
-                                        <tr>
-                                            <td>مخاطر الخصوصية</td>
-                                            <td>قانونية</td>
-                                            <td>إشعارات خصوصية، صلاحيات دقيقة، وعدم نقل بيانات إلا بضمانات PDPL</td>
-                                        </tr>
-                                        <tr>
-                                            <td>عبء إضافي على المعلم</td>
-                                            <td>إجهاد</td>
-                                            <td>قوالب رسائل جاهزة، جدولة أسبوعية، وتكامل مع خطط الدروس</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- خطط الدعم الجماعية -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-success text-white">
-                            <h5>خطط الدعم الجماعية</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="card mb-3">
-                                        <div class="card-body">
-                                            <h6>برنامج تحسين السلوك الصفي</h6>
-                                            <p>جلسات أسبوعية جماعية تركز على:</p>
-                                            <ul>
-                                                <li>مهارات التواصل الفعال</li>
-                                                <li>إدارة الوقت والانضباط الذاتي</li>
-                                                <li>التعاون والعمل الجماعي</li>
-                                            </ul>
-                                            <span class="badge bg-primary">مدة البرنامج: 6 أسابيع</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card mb-3">
-                                        <div class="card-body">
-                                            <h6>ورشة أولياء الأمور</h6>
-                                            <p>جلسات توعوية لأولياء الأمور تشمل:</p>
-                                            <ul>
-                                                <li>كيفية استخدام ClassDojo</li>
-                                                <li>استراتيجيات دعم الأبناء دراسياً</li>
-                                                <li>التعامل مع المشكلات السلوكية</li>
-                                            </ul>
-                                            <span class="badge bg-primary">مدة الورشة: 4 جلسات</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card mb-3">
-                                        <div class="card-body">
-                                            <h6>برنامج التحصيل الدراسي</h6>
-                                            <p>جلسات دعم دراسي جماعي:</p>
-                                            <ul>
-                                                <li>مراجعة المواد الدراسية الأساسية</li>
-                                                <li>تعلم استراتيجيات المذاكرة الفعالة</li>
-                                                <li>تدريبات حل المشكلات</li>
-                                            </ul>
-                                            <span class="badge bg-primary">مدة البرنامج: 8 أسابيع</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card mb-3">
-                                        <div class="card-body">
-                                            <h6>نادي المهارات الحياتية</h6>
-                                            <p>أنشطة لتعزيز المهارات الشخصية:</p>
-                                            <ul>
-                                                <li>مهارات القيادة</li>
-                                                <li>التفكير الإبداعي</li>
-                                                <li>حل المشكلات</li>
-                                            </ul>
-                                            <span class="badge bg-primary">مدة النادي: فصل دراسي</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            
+            <button id="restart-btn">إعادة المسابقة</button>
+            
+            <div class="feedback" id="feedback">
+                <!-- سيتم ملء التقييم ديناميكيًا -->
             </div>
         </div>
-
-        <!-- صفحة خطط الدعم الفردي - تم تحديثها -->
-        <div id="plans" class="page-section">
-            <div class="card">
-                <div class="card-header">
-                    خطط الدعم الفردي والجماعي للطلاب
-                </div>
-                <div class="card-body">
-                    <!-- خطط الدعم الفردي -->
-                    <div class="plan-section mb-4">
-                        <h5>نموذج الخطة العلاجية الفردية</h5>
-                        <p>تم تصميم هذا النموذج لدعم الطلاب الذين يحتاجون إلى متابعة فردية لتحسين تحصيلهم الدراسي وسلوكهم.</p>
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label class="form-label">اسم الطالب:</label>
-                                    <select class="form-select" id="student-name">
-                                        <option value="">اختر الطالب</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label class="form-label">الصف:</label>
-                                    <input type="text" class="form-control" value="الأول الثانوي" readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label class="form-label">نوع الخطة:</label>
-                                    <select class="form-select" id="plan-type">
-                                        <option value="behavioral">تحسين سلوكي</option>
-                                        <option value="academic">تحصيل دراسي</option>
-                                        <option value="comprehensive">شاملة (سلوكي ودراسي)</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">المادة:</label>
-                                    <select class="form-select" id="subject">
-                                        <option value="chemistry">كيمياء - عبدالله محمد حمدي</option>
-                                        <option value="math">رياضيات - عبدالعزيز عايض القحطاني</option>
-                                        <option value="biology">أحياء - عبدالرحمن عبدالله الغامدي</option>
-                                        <option value="english">انجليزي - فهد ابراهيم المحبوب</option>
-                                        <option value="language">الكفايات اللغوية - محمد أحمد العميري</option>
-                                        <option value="technology">التقنية الرقمية - فارس سعيد الغامدي</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">المعلم المسؤول:</label>
-                                    <input type="text" class="form-control" id="teacher-name" readonly>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">الخطوات المقترحة للعلاج:</label>
-                            <textarea class="form-control" id="treatment-steps" rows="4" placeholder="ادخل الخطوات المقترحة للعلاج..."></textarea>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">مؤشرات التقدم:</label>
-                            <textarea class="form-control" id="progress-indicators" rows="3" placeholder="ادخل مؤشرات التقدم المتوقعة..."></textarea>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">الجدول الزمني:</label>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <input type="date" class="form-control" id="start-date">
-                                </div>
-                                <div class="col-md-6">
-                                    <input type="date" class="form-control" id="end-date">
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">توقيع ولي الأمر:</label>
-                                    <input type="text" class="form-control" id="parent-signature" placeholder="توقيع ولي الأمر">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label class="form-label">توقيع المرشد الطلابي:</label>
-                                    <input type="text" class="form-control" value="منصور موسى حامظي" readonly>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <button class="btn btn-primary" id="save-plan">حفظ الخطة</button>
-                        <button class="btn btn-outline-secondary me-2" id="print-plan">طباعة النموذج</button>
-                        <button class="btn btn-success me-2" id="assign-group-plan">إضافة لخطة جماعية</button>
-                    </div>
-                    
-                    <!-- خطط الدعم الجماعية -->
-                    <div class="plan-section">
-                        <h5>خطط الدعم الجماعية المتاحة</h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                        <h6>برنامج تحسين السلوك الصفي</h6>
-                                        <p class="card-text">جلسات أسبوعية لتحسين السلوك الصفي ومهارات التواصل.</p>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span class="badge bg-primary">6 أسابيع</span>
-                                            <button class="btn btn-sm btn-outline-primary assign-btn" data-plan="behavior">تعيين طلاب</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                        <h6>برنامج التحصيل الدراسي</h6>
-                                        <p class="card-text">جلسات دعم دراسي جماعي لتحسين المستوى الأكاديمي.</p>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span class="badge bg-primary">8 أسابيع</span>
-                                            <button class="btn btn-sm btn-outline-primary assign-btn" data-plan="academic">تعيين طلاب</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                        <h6>نادي المهارات الحياتية</h6>
-                                        <p class="card-text">أنشطة لتعزيز المهارات الشخصية والقيادية.</p>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span class="badge bg-primary">فصل دراسي</span>
-                                            <button class="btn btn-sm btn-outline-primary assign-btn" data-plan="life-skills">تعيين طلاب</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card mb-3">
-                                    <div class="card-body">
-                                        <h6>ورشة أولياء الأمور</h6>
-                                        <p class="card-text">جلسات توعوية لأولياء الأمور حول دعم الأبناء.</p>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span class="badge bg-primary">4 جلسات</span>
-                                            <button class="btn btn-sm btn-outline-primary assign-btn" data-plan="parent-workshop">تعيين أسر</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- باقي الصفحات تبقى كما هي -->
-        <!-- ... -->
     </div>
 
-    <!-- الأكواد البرمجية الأخرى تبقى كما هي -->
-    <!-- ... -->
-
     <script>
-        // إضافة دالة لتعيين الطلاب لخطط جماعية
-        document.querySelectorAll('.assign-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const planType = this.getAttribute('data-plan');
-                const planNames = {
-                    'behavior': 'برنامج تحسين السلوك الصفي',
-                    'academic': 'برنامج التحصيل الدراسي',
-                    'life-skills': 'نادي المهارات الحياتية',
-                    'parent-workshop': 'ورشة أولياء الأمور'
-                };
-                
-                // هنا يمكنك إضافة كود لفتح نافذة لاختيار الطلاب
-                alert(`سيتم فتح نافذة لتعيين الطلاب لـ ${planNames[planType]}`);
+        // أسئلة المسابقة مع إجابات مختلطة - 35 سؤالاً
+        const questions = [
+            {
+                question: "ما هو الناتج الرئيسي لتفاعل الاحتراق الكامل للهيدروكربونات؟",
+                options: [
+                    "ثاني أكسيد الكربون والماء",
+                    "أول أكسيد الكربون والهيدروجين",
+                    "الميثان والأكسجين",
+                    "الأوزون والنيتروجين"
+                ],
+                correctAnswer: 0,
+                explanation: "في الاحتراق الكامل للهيدروكربونات، يتفاعل الوقود مع كمية كافية من الأكسجين لينتج ثاني أكسيد الكربون والماء."
+            },
+            {
+                question: "أي من التفاعلات التالية يمثل تفاعل إحلال مزدوج؟",
+                options: [
+                    "تفاعل الحمض مع القاعدة",
+                    "احتراق المغنيسيوم",
+                    "تفاعل الصوديوم مع الماء",
+                    "تفاعل البوليمرة"
+                ],
+                correctAnswer: 0,
+                explanation: "تفاعل الحمض مع القاعدة هو تفاعل إحلال مزدوج حيث يتبادل الأيونات بين المركبين لتكوين ملح وماء."
+            },
+            {
+                question: "ما نوع التفاعل الذي يحدث عند تفاعل الحديد مع الكبريت؟",
+                options: [
+                    "تفاعل اتحاد مباشر",
+                    "تفاعل تحلل",
+                    "تفاعل إحلال بسيط",
+                    "تفاعل إحلال مزدوج"
+                ],
+                correctAnswer: 0,
+                explanation: "تفاعل الحديد مع الكبريت هو تفاعل اتحاد مباشر حيث يتحد عنصران لتكوين مركب جديد (كبريتيد الحديد)."
+            },
+            {
+                question: "أي من العناصر التالية أكثر نشاطًا كيميائيًا؟",
+                options: [
+                    "البوتاسيوم",
+                    "الحديد",
+                    "النحاس",
+                    "الفضة"
+                ],
+                correctAnswer: 0,
+                explanation: "البوتاسيوم هو الأكثر نشاطًا كيميائيًا بين هذه العناصر، حيث يقع في المجموعة الأولى من الجدول الدوري وهو شديد التفاعل مع الماء والهواء."
+            },
+            {
+                question: "ما هو الغاز المنطلق عند تفاعل الحمض مع الفلز؟",
+                options: [
+                    "غاز الهيدروجين",
+                    "غاز الأكسجين",
+                    "غاز النيتروجين",
+                    "غاز ثاني أكسيد الكربون"
+                ],
+                correctAnswer: 0,
+                explanation: "عند تفاعل الحمض مع فلز نشط، ينتج ملح الفلز ويتصاعد غاز الهيدروجين."
+            },
+            {
+                question: "ما هو العامل الحفاز في تفاعل تحلل بيروكسيد الهيدروجين؟",
+                options: [
+                    "ثاني أكسيد المنجنيز",
+                    "كلوريد الصوديوم",
+                    "كبريتات النحاس",
+                    "هيدروكسيد الصوديوم"
+                ],
+                correctAnswer: 0,
+                explanation: "ثاني أكسيد المنجنيز يعمل كعامل حفاز في تفاعل تحلل بيروكسيد الهيدروجين إلى ماء وأكسجين."
+            },
+            {
+                question: "أي من التفاعلات التالية يصنف كتفاعل تأكسد واختزال؟",
+                options: [
+                    "تفاعل الزنك مع حمض الهيدروكلوريك",
+                    "تفاعل كلوريد الصوديوم مع نترات الفضة",
+                    "تكوين كلوريد الأمونيوم من الأمونيا وكلوريد الهيدروجين",
+                    "ذوبان السكر في الماء"
+                ],
+                correctAnswer: 0,
+                explanation: "تفاعل الزنك مع حمض الهيدروكلوريك هو تفاعل تأكسد واختزال حيث يتأكسد الزنك ويُختزل أيون الهيدروجين."
+            },
+            {
+                question: "ما هي نواتج تفاعل التعادل؟",
+                options: [
+                    "ملح وماء",
+                    "حمض وقاعدة",
+                    "أكسيد وماء",
+                    "غاز وهيدروكسيد"
+                ],
+                correctAnswer: 0,
+                explanation: "تفاعل التعادل بين الحمض والقاعدة ينتج ملحًا وماءً."
+            },
+            {
+                question: "أي من المركبات التالية ينتج من تفاعل أكسيد الفلز مع الماء؟",
+                options: [
+                    "القاعدة",
+                    "الحمض",
+                    "الملح",
+                    "الأكسيد"
+                ],
+                correctAnswer: 0,
+                explanation: "عند تفاعل أكسيد الفلز مع الماء، ينتج هيدروكسيد الفلز (قاعدة)."
+            },
+            {
+                question: "ما هو التفاعل الذي تستخدم فيه الخلايا الكهروكيميائية؟",
+                options: [
+                    "تفاعل التحليل الكهربائي",
+                    "تفاعل الاحتراق",
+                    "تفاعل التبادل الأيوني",
+                    "تفاعل البلمرة"
+                ],
+                correctAnswer: 0,
+                explanation: "تفاعل التحليل الكهربائي يستخدم الخلايا الكهروكيميائية لتحليل المركبات الكيميائية بتمرير تيار كهربائي."
+            },
+            {
+                question: "ما هو لون راسب كلوريد الفضة؟",
+                options: [
+                    "أبيض",
+                    "أصفر",
+                    "أزرق",
+                    "أحمر"
+                ],
+                correctAnswer: 0,
+                explanation: "كلوريد الفضة يكون على شكل راسب أبيض اللون."
+            },
+            {
+                question: "أي من الأحماض التالية يستخدم في صناعة البطاريات؟",
+                options: [
+                    "حمض الكبريتيك",
+                    "حمض النيتريك",
+                    "حمض الهيدروكلوريك",
+                    "حمض الخليك"
+                ],
+                correctAnswer: 0,
+                explanation: "حمض الكبريتيك يستخدم في صناعة بطاريات السيارات (البطاريات الرصاصية)."
+            },
+            {
+                question: "ما هو الغاز الذي يسبب ظاهرة الاحتباس الحراري؟",
+                options: [
+                    "ثاني أكسيد الكربون",
+                    "الأكسجين",
+                    "النيتروجين",
+                    "الهيدروجين"
+                ],
+                correctAnswer: 0,
+                explanation: "ثاني أكسيد الكربون هو أحد الغازات الرئيسية المسببة لظاهرة الاحتباس الحراري."
+            },
+            {
+                question: "أي من العناصر التالية يعتبر من الغازات النبيلة؟",
+                options: [
+                    "النيون",
+                    "الكالسيوم",
+                    "الحديد",
+                    "الصوديوم"
+                ],
+                correctAnswer: 0,
+                explanation: "النيون هو أحد الغازات النبيلة في الجدول الدوري التي تتميز بعدم تفاعليتها."
+            },
+            {
+                question: "ما هو الرقم الهيدروجيني للمحلول المتعادل؟",
+                options: [
+                    "7",
+                    "1",
+                    "14",
+                    "0"
+                ],
+                correctAnswer: 0,
+                explanation: "المحلول المتعادل له رقم هيدروجيني يساوي 7."
+            },
+            {
+                question: "أي من التفاعلات التالية ينتج غاز الأكسجين؟",
+                options: [
+                    "تحلل كلورات البوتاسيوم",
+                    "تفاعل الصوديوم مع الماء",
+                    "تفاعل الحمض مع القاعدة",
+                    "تفاعل الفلز مع الحمض"
+                ],
+                correctAnswer: 0,
+                explanation: "تحلل كلورات البوتاسيوم بالحرارة ينتج كلوريد البوتاسيوم وغاز الأكسجين."
+            },
+            {
+                question: "ما هو اسم تفاعل تكوين الإستر من الحمض والكحول؟",
+                options: [
+                    "تفاعل الأسترة",
+                    "تفاعل التصبن",
+                    "تفاعل البلمرة",
+                    "تفاعل التعادل"
+                ],
+                correctAnswer: 0,
+                explanation: "تفاعل الأسترة هو تفاعل تكوين الإستر من الحمض الكربوكسيلي والكحول."
+            },
+            {
+                question: "أي من المركبات التالية يستخدم في إطفاء الحرائق؟",
+                options: [
+                    "ثاني أكسيد الكربون",
+                    "الأكسجين",
+                    "الهيدروجين",
+                    "الميثان"
+                ],
+                correctAnswer: 0,
+                explanation: "ثاني أكسيد الكربون يستخدم في طفايات الحريق لأنه لا يدعم الاحتراق."
+            },
+            {
+                question: "ما هو العدد الذري للكربون؟",
+                options: [
+                    "6",
+                    "12",
+                    "14",
+                    "8"
+                ],
+                correctAnswer: 0,
+                explanation: "العدد الذري للكربون هو 6، مما يعني أن نواة ذرة الكربون تحتوي على 6 بروتونات."
+            },
+            {
+                question: "أي من التفاعلات التالية يعد تفاعل طارد للحرارة؟",
+                options: [
+                    "احتراق الوقود",
+                    "ذوبان الثلج",
+                    "تبخر الماء",
+                    "انصهار الشمع"
+                ],
+                correctAnswer: 0,
+                explanation: "احتراق الوقود هو تفاعل طارد للحرارة حيث يطلق حرارة إلى الوسط المحيط."
+            },
+            {
+                question: "ما هو اسم المركب NaOH؟",
+                options: [
+                    "هيدروكسيد الصوديوم",
+                    "كلوريد الصوديوم",
+                    "كربونات الصوديوم",
+                    "بيكربونات الصوديوم"
+                ],
+                correctAnswer: 0,
+                explanation: "NaOH هو هيدروكسيد الصوديوم، المعروف أيضًا باسم الصودا الكاوية."
+            },
+            {
+                question: "أي من العناصر التالية يعتبر من أشباه الفلزات؟",
+                options: [
+                    "السيليكون",
+                    "الكالسيوم",
+                    "الكلور",
+                    "الصوديوم"
+                ],
+                correctAnswer: 0,
+                explanation: "السيليكون هو أحد أشباه الفلزات التي تجمع بين خصائص الفلزات واللافلزات."
+            },
+            {
+                question: "ما هو الرمز الكيميائي للذهب؟",
+                options: [
+                    "Au",
+                    "Ag",
+                    "Fe",
+                    "Cu"
+                ],
+                correctAnswer: 0,
+                explanation: "الرمز الكيميائي للذهب هو Au من الكلمة اللاتينية Aurum."
+            },
+            {
+                question: "أي من الأحماض التالية يوجد في الخل؟",
+                options: [
+                    "حمض الخليك",
+                    "حمض الستريك",
+                    "حمض الكبريتيك",
+                    "حمض النيتريك"
+                ],
+                correctAnswer: 0,
+                explanation: "الخل يحتوي على حمض الخليك الذي يعطيه الطعم الحامض."
+            },
+            {
+                question: "ما هو اسم تفاعل تحلل السكر بفعل الخميرة؟",
+                options: [
+                    "التخمر",
+                    "الأكسدة",
+                    "الاحتراق",
+                    "التعادل"
+                ],
+                correctAnswer: 0,
+                explanation: "تحلل السكر بفعل الخميرة يسمى التخمر وينتج الإيثانول وثاني أكسيد الكربون."
+            },
+            {
+                question: "أي من المركبات التالية يستخدم في صناعة الأسمنت؟",
+                options: [
+                    "كربونات الكالسيوم",
+                    "كلوريد الصوديوم",
+                    "كبريتات النحاس",
+                    "هيدروكسيد الصوديوم"
+                ],
+                correctAnswer: 0,
+                explanation: "كربونات الكالسيوم (الحجر الجيري) هو المادة الأساسية في صناعة الأسمنت."
+            },
+            {
+                question: "ما هو الغاز المستخدم في إطارات السيارات للتقليل من استهلاك الوقود؟",
+                options: [
+                    "النيتروجين",
+                    "الأكسجين",
+                    "الهيدروجين",
+                    "ثاني أكسيد الكربون"
+                ],
+                correctAnswer: 0,
+                explanation: "النيتروجين يستخدم في إطارات السيارات لأنه لا يتفاعل مع المطاط ويحافظ على ضغط الإطارات لفترة أطول."
+            },
+            {
+                question: "أي من التفاعلات التالية ينتج ملحاً وماءً فقط؟",
+                options: [
+                    "تفاعل الحمض مع القاعدة",
+                    "تفاعل الفلز مع الحمض",
+                    "تفاعل أكسيد الفلز مع الحمض",
+                    "تفاعل أكسيد اللافلز مع القاعدة"
+                ],
+                correctAnswer: 0,
+                explanation: "تفاعل الحمض مع القاعدة ينتج ملحاً وماءً فقط في تفاعل التعادل."
+            },
+            {
+                question: "ما هو اسم المركب CuSO₄؟",
+                options: [
+                    "كبريتات النحاس",
+                    "كربونات النحاس",
+                    "نترات النحاس",
+                    "كلوريد النحاس"
+                ],
+                correctAnswer: 0,
+                explanation: "CuSO₄ هو كبريتات النحاس، ويستخدم في الزراعة ومبيدات الفطريات."
+            },
+            {
+                question: "أي من العناصر التالية يعتبر من العناصر الانتقالية؟",
+                options: [
+                    "الحديد",
+                    "الصوديوم",
+                    "الكالسيوم",
+                    "البوتاسيوم"
+                ],
+                correctAnswer: 0,
+                explanation: "الحديد هو أحد العناصر الانتقالية في الجدول الدوري."
+            },
+            {
+                question: "ما هو الغاز الذي ينتج عند تفاعل كربونات الفلز مع الحمض؟",
+                options: [
+                    "ثاني أكسيد الكربون",
+                    "الهيدروجين",
+                    "الأكسجين",
+                    "النيتروجين"
+                ],
+                correctAnswer: 0,
+                explanation: "عند تفاعل كربونات الفلز مع الحمض، ينتج ملح الفلز وماء وثاني أكسيد الكربون."
+            },
+            {
+                question: "أي من المركبات التالية يستخدم في صناعة المبيدات الحشرية؟",
+                options: [
+                    "DDT",
+                    "NaCl",
+                    "H₂O",
+                    "CO₂"
+                ],
+                correctAnswer: 0,
+                explanation: "DDT هو مركب كيميائي كان يستخدم على نطاق واسع كمبيد حشري قبل أن يتم حظره في العديد من البلدان."
+            },
+            {
+                question: "ما هو اسم العملية التي تتحول فيها المادة من الحالة الصلبة إلى الحالة الغازية مباشرة؟",
+                options: [
+                    "التسامي",
+                    "التكثف",
+                    "الانصهار",
+                    "التبخر"
+                ],
+                correctAnswer: 0,
+                explanation: "التسامي هو تحول المادة من الحالة الصلبة إلى الحالة الغازية مباشرة دون المرور بالحالة السائلة."
+            },
+            {
+                question: "أي من الأحماض التالية يوجد في المعدة؟",
+                options: [
+                    "حمض الهيدروكلوريك",
+                    "حمض الكبريتيك",
+                    "حمض النيتريك",
+                    "حمض الخليك"
+                ],
+                correctAnswer: 0,
+                explanation: "المعدة تفرز حمض الهيدروكلوريك الذي يساعد في هضم الطعام وقتل البكتيريا."
+            },
+            {
+                question: "ما هو الرمز الكيميائي للفضة؟",
+                options: [
+                    "Ag",
+                    "Au",
+                    "Fe",
+                    "Cu"
+                ],
+                correctAnswer: 0,
+                explanation: "الرمز الكيميائي للفضة هو Ag من الكلمة اللاتينية Argentum."
+            }
+        ];
+
+        // تهيئة المتغيرات
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let score = 0;
+        let timeLeft = 1800; // 30 دقيقة بالثواني
+        let timerInterval;
+        let startTime;
+
+        // عناصر DOM
+        const quizContent = document.getElementById('quiz-content');
+        const resultContainer = document.getElementById('result-container');
+        const questionElement = document.getElementById('question');
+        const optionsContainer = document.getElementById('options-container');
+        const currentQuestionElement = document.getElementById('current-question');
+        const totalQuestionsElement = document.getElementById('total-questions');
+        const progressBar = document.getElementById('progress-bar');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const scoreElement = document.getElementById('score');
+        const scoreTextElement = document.getElementById('score-text');
+        const feedbackElement = document.getElementById('feedback');
+        const timerElement = document.getElementById('timer');
+        const medalElement = document.getElementById('medal');
+        const questionJumpElement = document.getElementById('question-jump');
+        const correctAnswersElement = document.getElementById('correct-answers');
+        const wrongAnswersElement = document.getElementById('wrong-answers');
+        const timeTakenElement = document.getElementById('time-taken');
+
+        // تهيئة المسابقة
+        function initQuiz() {
+            totalQuestionsElement.textContent = questions.length;
+            updateProgressBar();
+            startTimer();
+            createQuestionJumpButtons();
+            showQuestion();
+            startTime = new Date();
+        }
+
+        // إنشاء أزرار القفز بين الأسئلة
+        function createQuestionJumpButtons() {
+            questionJumpElement.innerHTML = '';
+            for (let i = 0; i < questions.length; i++) {
+                const button = document.createElement('div');
+                button.classList.add('question-jump-btn');
+                if (i === currentQuestionIndex) {
+                    button.classList.add('current');
+                } else if (userAnswers[i] !== null) {
+                    button.classList.add('answered');
+                }
+                button.textContent = i + 1;
+                button.addEventListener('click', () => {
+                    currentQuestionIndex = i;
+                    showQuestion();
+                    updateProgressBar();
+                    updateQuestionJumpButtons();
+                });
+                questionJumpElement.appendChild(button);
+            }
+        }
+
+        // تحديث أزرار القفز بين الأسئلة
+        function updateQuestionJumpButtons() {
+            const buttons = questionJumpElement.querySelectorAll('.question-jump-btn');
+            buttons.forEach((button, index) => {
+                button.classList.remove('current', 'answered');
+                if (index === currentQuestionIndex) {
+                    button.classList.add('current');
+                } else if (userAnswers[index] !== null) {
+                    button.classList.add('answered');
+                }
             });
-        });
+        }
 
-        // تحديث اسم المعلم عند تغيير المادة
-        document.getElementById('subject').addEventListener('change', function() {
-            const teachers = {
-                'chemistry': 'عبدالله محمد حمدي',
-                'math': 'عبدالعزيز عايض القحطاني',
-                'biology': 'عبدالرحمن عبدالله الغامدي',
-                'english': 'فهد ابراهيم المحبوب',
-                'language': 'محمد أحمد العميري',
-                'technology': 'فارس سعيد الغامدي'
-            };
+        // بدء المؤقت
+        function startTimer() {
+            clearInterval(timerInterval);
+            updateTimerDisplay();
             
-            document.getElementById('teacher-name').value = teachers[this.value];
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endQuiz();
+                }
+            }, 1000);
+        }
+
+        // تحديث عرض المؤقت
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `⏱ ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft < 300) { // أقل من 5 دقائق
+                timerElement.style.color = '#b21f1f';
+                timerElement.classList.add('pulse');
+            }
+        }
+
+        // عرض السؤال الحالي
+        function showQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            questionElement.textContent = currentQuestion.question;
+            currentQuestionElement.textContent = currentQuestionIndex + 1;
+            
+            // إضافة الخيارات بشكل عشوائي
+            optionsContainer.innerHTML = '';
+            const shuffledOptions = [...currentQuestion.options].sort(() => Math.random() - 0.5);
+            
+            shuffledOptions.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.classList.add('option');
+                if (userAnswers[currentQuestionIndex] === index) {
+                    optionElement.classList.add('selected');
+                }
+                
+                optionElement.innerHTML = `
+                    ${option}
+                    <span class="option-letter">${String.fromCharCode(65 + index)}</span>
+                `;
+                
+                optionElement.addEventListener('click', () => selectOption(index));
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // تحديث حالة الأزرار
+            updateButtons();
+            updateQuestionJumpButtons();
+        }
+
+        // اختيار إجابة
+        function selectOption(optionIndex) {
+            userAnswers[currentQuestionIndex] = optionIndex;
+            showQuestion();
+        }
+
+        // تحديث حالة أزرار التنقل
+        function updateButtons() {
+            prevBtn.disabled = currentQuestionIndex === 0;
+            
+            if (currentQuestionIndex === questions.length - 1) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'block';
+            } else {
+                nextBtn.style.display = 'block';
+                submitBtn.style.display = 'none';
+            }
+        }
+
+        // تحديث شريط التقدم
+        function updateProgressBar() {
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // الانتقال إلى السؤال التالي
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                showQuestion();
+                updateProgressBar();
+            }
         });
 
-        // إضافة طالب لخطة جماعية
-        document.getElementById('assign-group-plan').addEventListener('click', function() {
-            const studentIndex = document.getElementById('student-name').value;
-            if (!studentIndex) {
-                alert('يرجى اختيار طالب أولاً');
-                return;
+        // الانتقال إلى السؤال السابق
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion();
+                updateProgressBar();
+            }
+        });
+
+        // إنهاء المسابقة وعرض النتائج
+        submitBtn.addEventListener('click', endQuiz);
+
+        function endQuiz() {
+            clearInterval(timerInterval);
+            calculateScore();
+            showResults();
+        }
+
+        // حساب النتيجة
+        function calculateScore() {
+            score = 0;
+            questions.forEach((question, index) => {
+                if (userAnswers[index] === question.correctAnswer) {
+                    score++;
+                }
+            });
+        }
+
+        // عرض النتائج
+        function showResults() {
+            quizContent.style.display = 'none';
+            resultContainer.style.display = 'block';
+            
+            const percentage = Math.round((score / questions.length) * 100);
+            scoreElement.textContent = `${percentage}%`;
+            
+            // حساب الوقت المستغرق
+            const endTime = new Date();
+            const timeTaken = Math.round((endTime - startTime) / 1000);
+            const minutes = Math.floor(timeTaken / 60);
+            const seconds = timeTaken % 60;
+            timeTakenElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            // تحديث الإحصائيات
+            correctAnswersElement.textContent = score;
+            wrongAnswersElement.textContent = questions.length - score;
+            
+            // نص التقييم بناءً على النتيجة
+            let feedbackText = '';
+            let medal = '🥉';
+            
+            if (percentage >= 90) {
+                scoreTextElement.textContent = 'ممتاز! أنت خبير في الكيمياء!';
+                feedbackText = 'أظهرت فهمًا عميقًا لمبادئ التفاعلات الكيميائية. يمكنك بسهولة متابعة دراسة متقدمة في هذا المجال.';
+                medal = '🥇';
+            } else if (percentage >= 70) {
+                scoreTextElement.textContent = 'جيد جدًا! لديك معرفة قوية بالكيمياء.';
+                feedbackText = 'أظهرت معرفة جيدة بأنواع التفاعلات الكيميائية وآلياتها. يمكنك تحسين أدائك بالمزيد من الممارسة.';
+                medal = '🥈';
+            } else if (percentage >= 50) {
+                scoreTextElement.textContent = 'مستوى مقبول! يمكنك تحسين أدائك.';
+                feedbackText = 'لديك فهم أساسي للتفاعلات الكيميائية، لكن تحتاج إلى مراجعة بعض المفاهيم لتحسين أدائك.';
+                medal = '🥉';
+            } else {
+                scoreTextElement.textContent = 'يحتاج إلى تحسين! راجع مفاهيم الكيمياء الأساسية.';
+                feedbackText = 'يبدو أنك تحتاج إلى مراجعة أساسيات التفاعلات الكيميائية. ننصحك بالعودة إلى المواد الدراسية والمزيد من التمارين.';
+                medal = '📚';
             }
             
-            // هنا يمكنك إضافة كود لتعيين الطالب لخطة جماعية
-            alert('سيتم فتح نافذة لاختيار الخطة الجماعية المناسبة للطالب');
+            medalElement.textContent = medal;
+            
+            // إضافة شرح للإجابات
+            feedbackText += '<h3 style="margin-top: 20px; margin-bottom: 10px;">شرح الإجابات:</h3>';
+            questions.forEach((question, index) => {
+                const userAnswerIndex = userAnswers[index];
+                const isCorrect = userAnswerIndex === question.correctAnswer;
+                const answerStatus = isCorrect ? '✓' : '✗';
+                const answerClass = isCorrect ? 'correct' : 'incorrect';
+                
+                feedbackText += `
+                    <div style="margin-bottom: 15px; padding: 10px; border-radius: 5px; background: ${isCorrect ? '#d4edda' : '#f8d7da'};">
+                        <strong>السؤال ${index + 1}:</strong> ${question.question}<br>
+                        <strong>إجابتك:</strong> <span class="${answerClass}">${answerStatus} ${question.options[userAnswerIndex] || 'لم تجب'}</span><br>
+                        <strong>الإجابة الصحيحة:</strong> ${question.options[question.correctAnswer]}<br>
+                        <strong>التفسير:</strong> ${question.explanation}
+                    </div>
+                `;
+            });
+            
+            feedbackElement.innerHTML = feedbackText;
+        }
+
+        // إعادة بدء المسابقة
+        restartBtn.addEventListener('click', () => {
+            currentQuestionIndex = 0;
+            userAnswers = new Array(questions.length).fill(null);
+            score = 0;
+            timeLeft = 1800;
+            
+            quizContent.style.display = 'block';
+            resultContainer.style.display = 'none';
+            timerElement.classList.remove('pulse');
+            timerElement.style.color = 'white';
+            
+            initQuiz();
         });
 
-        // باقي الأكواد البرمجية تبقى كما هي
-        // ...
+        // بدء المسابقة عند تحميل الصفحة
+        window.onload = initQuiz;
     </script>
 </body>
 </html>
