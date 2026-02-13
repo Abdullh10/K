@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة شد الحبل التعليمية</title>
+    <title>ألعاب شد الحبل التعليمية - حسب المادة</title>
     <style>
         * {
             margin: 0;
@@ -22,7 +22,7 @@
         }
 
         /* الحاوية الرئيسية */
-        .game-container {
+        .main-container {
             width: 100%;
             max-width: 1200px;
             background: rgba(255, 255, 255, 0.95);
@@ -32,21 +32,104 @@
             backdrop-filter: blur(10px);
         }
 
-        /* رأس اللعبة */
-        .game-header {
+        /* رأس الصفحة */
+        .header {
             text-align: center;
-            margin-bottom: 20px;
-            position: relative;
+            margin-bottom: 30px;
         }
 
-        .game-header h1 {
+        .header h1 {
             font-size: 2.5em;
             color: #333;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 10px;
         }
 
-        /* شريط الإعدادات */
+        .header p {
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        /* شبكة المواد - الصفحة الرئيسية */
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .subject-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 10px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            border-color: #667eea;
+        }
+
+        .subject-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .subject-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .subject-desc {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* منطقة اللعبة (تظهر عند اختيار مادة) */
+        .game-area {
+            display: none;
+        }
+
+        /* رأس اللعبة مع اسم المادة وزر العودة */
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 50px;
+        }
+
+        .game-header h2 {
+            font-size: 1.8em;
+            color: #333;
+        }
+
+        .back-btn {
+            padding: 10px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #5a67d8;
+            transform: scale(1.05);
+        }
+
+        /* شريط الإعدادات داخل اللعبة */
         .settings-bar {
             display: flex;
             flex-wrap: wrap;
@@ -156,7 +239,7 @@
 
         .rope-fill {
             height: 100%;
-            width: 50%; /* البداية من المنتصف */
+            width: 50%;
             background: linear-gradient(90deg, #f6d365 0%, #fda085 100%);
             transition: width 0.5s ease-in-out;
             position: relative;
@@ -279,31 +362,6 @@
             cursor: not-allowed;
         }
 
-        /* زر البداية وإعادة اللعب */
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px 0;
-        }
-
-        .action-btn {
-            padding: 12px 30px;
-            font-size: 1.2em;
-            border: none;
-            border-radius: 50px;
-            background: #667eea;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: bold;
-        }
-
-        .action-btn:hover {
-            background: #5a67d8;
-            transform: scale(1.05);
-        }
-
         /* شاشة النتائج */
         .results-screen {
             position: fixed;
@@ -400,98 +458,96 @@
                 width: 30px;
                 height: 30px;
             }
+            .subjects-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <!-- رأس الصفحة -->
-        <div class="game-header">
-            <h1>🎮 لعبة شد الحبل التعليمية</h1>
-        </div>
-
-        <!-- شريط الإعدادات -->
-        <div class="settings-bar" id="settingsBar">
-            <div class="settings-item">
-                <label>المادة:</label>
-                <select id="subjectSelect">
-                    <option value="all">الكل</option>
-                    <option value="كيمياء">كيمياء</option>
-                    <option value="رياضيات">رياضيات</option>
-                    <option value="فيزياء">فيزياء</option>
-                    <option value="عربية">لغة عربية</option>
-                    <option value="إنجليزي">إنجليزي</option>
-                </select>
+    <div class="main-container">
+        <!-- شاشة المواد الرئيسية -->
+        <div id="subjectsScreen" class="subjects-screen">
+            <div class="header">
+                <h1>🎮 ألعاب شد الحبل التعليمية</h1>
+                <p>اختر المادة التي تريد المنافسة فيها</p>
             </div>
-            <div class="settings-item">
-                <label>الصعوبة:</label>
-                <select id="difficultySelect">
-                    <option value="all">الكل</option>
-                    <option value="سهل">سهل</option>
-                    <option value="متوسط">متوسط</option>
-                    <option value="صعب">صعب</option>
-                </select>
-            </div>
-            <div class="settings-item">
-                <label>وضع اللعب:</label>
-                <select id="modeSelect">
-                    <option value="1vCPU">لاعب ضد الكمبيوتر</option>
-                    <option value="1v1">لاعبان</option>
-                    <option value="team">الصف الدراسي (فرق)</option>
-                </select>
-            </div>
-            <div class="settings-item">
-                <button id="startGameBtn">ابدأ اللعبة</button>
+            <div class="subjects-grid" id="subjectsGrid">
+                <!-- سيتم إنشاء البطاقات بواسطة JavaScript -->
             </div>
         </div>
 
-        <!-- إحصائيات اللعبة (النتيجة والوقت) -->
-        <div class="stats-area">
-            <div class="team-score" id="teamAScore">
-                <div class="team">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23f39c12'/%3E%3Ccircle cx='35' cy='40' r='8' fill='white'/%3E%3Ccircle cx='65' cy='40' r='8' fill='white'/%3E%3Ccircle cx='30' cy='40' r='3' fill='black'/%3E%3Ccircle cx='60' cy='40' r='3' fill='black'/%3E%3Cpath d='M30 65 Q50 80,70 65' stroke='white' stroke-width='5' fill='none' /%3E%3C/svg%3E" alt="الفريق أ">
-                    <span>الفريق أ: <span id="scoreA">0</span></span>
+        <!-- منطقة اللعبة (تظهر عند اختيار مادة) -->
+        <div id="gameArea" class="game-area">
+            <div class="game-header">
+                <h2 id="currentSubjectTitle">الرياضيات</h2>
+                <button class="back-btn" id="backToSubjectsBtn">↩ العودة للمواد</button>
+            </div>
+
+            <!-- شريط الإعدادات -->
+            <div class="settings-bar">
+                <div class="settings-item">
+                    <label>الصعوبة:</label>
+                    <select id="difficultySelect">
+                        <option value="all">الكل</option>
+                        <option value="سهل">سهل</option>
+                        <option value="متوسط">متوسط</option>
+                        <option value="صعب">صعب</option>
+                    </select>
+                </div>
+                <div class="settings-item">
+                    <label>وضع اللعب:</label>
+                    <select id="modeSelect">
+                        <option value="1vCPU">لاعب ضد الكمبيوتر</option>
+                        <option value="1v1">لاعبان</option>
+                        <option value="team">الصف الدراسي (فرق)</option>
+                    </select>
+                </div>
+                <div class="settings-item">
+                    <button id="startGameBtn">ابدأ اللعبة</button>
                 </div>
             </div>
-            <div class="timer" id="timerDisplay">60</div>
-            <div class="team-score" id="teamBScore">
-                <div class="team">
-                    <span>الفريق ب: <span id="scoreB">0</span></span>
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%233498db'/%3E%3Ccircle cx='35' cy='40' r='8' fill='white'/%3E%3Ccircle cx='65' cy='40' r='8' fill='white'/%3E%3Ccircle cx='30' cy='40' r='3' fill='black'/%3E%3Ccircle cx='60' cy='40' r='3' fill='black'/%3E%3Cpath d='M30 65 Q50 80,70 65' stroke='white' stroke-width='5' fill='none' /%3E%3C/svg%3E" alt="الفريق ب">
+
+            <!-- إحصائيات اللعبة -->
+            <div class="stats-area">
+                <div class="team-score">
+                    <div class="team">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23f39c12'/%3E%3Ccircle cx='35' cy='40' r='8' fill='white'/%3E%3Ccircle cx='65' cy='40' r='8' fill='white'/%3E%3Ccircle cx='30' cy='40' r='3' fill='black'/%3E%3Ccircle cx='60' cy='40' r='3' fill='black'/%3E%3Cpath d='M30 65 Q50 80,70 65' stroke='white' stroke-width='5' fill='none' /%3E%3C/svg%3E" alt="الفريق أ">
+                        <span>الفريق أ: <span id="scoreA">0</span></span>
+                    </div>
+                </div>
+                <div class="timer" id="timerDisplay">60</div>
+                <div class="team-score">
+                    <div class="team">
+                        <span>الفريق ب: <span id="scoreB">0</span></span>
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%233498db'/%3E%3Ccircle cx='35' cy='40' r='8' fill='white'/%3E%3Ccircle cx='65' cy='40' r='8' fill='white'/%3E%3Ccircle cx='30' cy='40' r='3' fill='black'/%3E%3Ccircle cx='60' cy='40' r='3' fill='black'/%3E%3Cpath d='M30 65 Q50 80,70 65' stroke='white' stroke-width='5' fill='none' /%3E%3C/svg%3E" alt="الفريق ب">
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- منطقة الحبل والمؤشر -->
-        <div class="tug-area">
-            <div class="rope-container">
-                <div class="rope-fill" id="ropeFill" style="width: 50%;"></div>
-            </div>
-            <div class="indicator" id="indicator" style="left: 50%;"></div>
-            <div class="characters">
-                <div class="character">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23f39c12'/%3E%3Ccircle cx='35' cy='40' r='8' fill='white'/%3E%3Ccircle cx='65' cy='40' r='8' fill='white'/%3E%3Ccircle cx='30' cy='40' r='3' fill='black'/%3E%3Ccircle cx='60' cy='40' r='3' fill='black'/%3E%3Cpath d='M30 65 Q50 80,70 65' stroke='white' stroke-width='5' fill='none' /%3E%3C/svg%3E" alt="شخصية أ">
-                    <span>الفريق أ</span>
+            <!-- منطقة الحبل والمؤشر -->
+            <div class="tug-area">
+                <div class="rope-container">
+                    <div class="rope-fill" id="ropeFill" style="width: 50%;"></div>
                 </div>
-                <div class="character">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%233498db'/%3E%3Ccircle cx='35' cy='40' r='8' fill='white'/%3E%3Ccircle cx='65' cy='40' r='8' fill='white'/%3E%3Ccircle cx='30' cy='40' r='3' fill='black'/%3E%3Ccircle cx='60' cy='40' r='3' fill='black'/%3E%3Cpath d='M30 65 Q50 80,70 65' stroke='white' stroke-width='5' fill='none' /%3E%3C/svg%3E" alt="شخصية ب">
-                    <span>الفريق ب</span>
+                <div class="indicator" id="indicator" style="left: 50%;"></div>
+                <div class="characters">
+                    <div class="character">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23f39c12'/%3E%3Ccircle cx='35' cy='40' r='8' fill='white'/%3E%3Ccircle cx='65' cy='40' r='8' fill='white'/%3E%3Ccircle cx='30' cy='40' r='3' fill='black'/%3E%3Ccircle cx='60' cy='40' r='3' fill='black'/%3E%3Cpath d='M30 65 Q50 80,70 65' stroke='white' stroke-width='5' fill='none' /%3E%3C/svg%3E" alt="شخصية أ">
+                        <span>الفريق أ</span>
+                    </div>
+                    <div class="character">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%233498db'/%3E%3Ccircle cx='35' cy='40' r='8' fill='white'/%3E%3Ccircle cx='65' cy='40' r='8' fill='white'/%3E%3Ccircle cx='30' cy='40' r='3' fill='black'/%3E%3Ccircle cx='60' cy='40' r='3' fill='black'/%3E%3Cpath d='M30 65 Q50 80,70 65' stroke='white' stroke-width='5' fill='none' /%3E%3C/svg%3E" alt="شخصية ب">
+                        <span>الفريق ب</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- منطقة السؤال والإجابات -->
-        <div class="question-area" id="questionArea" style="display: none;">
-            <div class="question-text" id="questionText">انقر على زر البدء لبدء اللعبة</div>
-            <div class="options-grid" id="optionsContainer">
-                <!-- الخيارات يتم إضافتها بواسطة JavaScript -->
+            <!-- منطقة السؤال -->
+            <div class="question-area" id="questionArea" style="display: none;">
+                <div class="question-text" id="questionText">انقر على زر البدء لبدء اللعبة</div>
+                <div class="options-grid" id="optionsContainer"></div>
             </div>
-        </div>
-
-        <!-- أزرار التحكم -->
-        <div class="action-buttons">
-            <button class="action-btn" id="resetGameBtn">إعادة تعيين</button>
-            <button class="action-btn" id="showResultsBtn">عرض النتائج المحفوظة</button>
         </div>
 
         <!-- شاشة النتائج -->
@@ -503,18 +559,18 @@
             </div>
         </div>
 
-        <!-- دليل الاستخدام -->
+        <!-- دليل الاستخدام (يظهر في كل الصفحات) -->
         <div class="guide">
             <h3>📘 دليل الاستخدام السريع</h3>
             <ul>
-                <li>اختر المادة ومستوى الصعوبة ووضع اللعب من الأعلى.</li>
-                <li>اضغط "ابدأ اللعبة" لبدء جولة جديدة (الوقت 60 ثانية).</li>
+                <li>اختر المادة التي تريد من الشبكة الرئيسية.</li>
+                <li>حدد مستوى الصعوبة ووضع اللعب ثم اضغط "ابدأ اللعبة".</li>
                 <li>لكل سؤال 4 خيارات، اختر الإجابة الصحيحة.</li>
                 <li>الإجابة الصحيحة تحرك الحبل نحو فريقك، والخاطئة نحو الخصم.</li>
-                <li>في وضع لاعب ضد الكمبيوتر، الكمبيوتر يجيب تلقائياً بعد 3 ثوانٍ.</li>
-                <li>في وضع لاعبان، يتناوب اللاعبون على الإجابة (يظهر الدور).</li>
+                <li>في وضع لاعب ضد الكمبيوتر، الكمبيوتر يجيب تلقائياً.</li>
+                <li>في وضع لاعبان، يتناوب اللاعبون على الإجابة.</li>
                 <li>في وضع الصف الدراسي، الفرق تتنافس كفريقين.</li>
-                <li>تنتهي الجولة بانتهاء الوقت أو وصول المؤشر إلى أحد الجانبين.</li>
+                <li>تنتهي الجولة بانتهاء الوقت (60 ثانية) أو وصول المؤشر لأحد الجانبين.</li>
                 <li>يمكنك حفظ النتائج محلياً ومشاهدتها لاحقاً.</li>
             </ul>
         </div>
@@ -522,71 +578,78 @@
 
     <script>
         // ***************************
-        // بيانات الأسئلة (30 سؤال تجريبي)
+        // بيانات المواد والأسئلة (30 سؤال موزعة على المواد)
         // ***************************
+        const subjectsData = [
+            { id: 'رياضيات', name: 'الرياضيات', icon: '🧮', desc: 'حساب سريع، جبر، هندسة', color: '#f39c12' },
+            { id: 'عربية', name: 'اللغة العربية', icon: '📖', desc: 'قواعد، أدب، بلاغة', color: '#2ecc71' },
+            { id: 'إنجليزي', name: 'اللغة الإنجليزية', icon: '🇬🇧', desc: 'قواعد، مفردات، محادثة', color: '#3498db' },
+            { id: 'كيمياء', name: 'الكيمياء', icon: '🧪', desc: 'ذرات، جزيئات، تفاعلات', color: '#9b59b6' },
+            { id: 'فيزياء', name: 'الفيزياء', icon: '⚡', desc: 'قوى، طاقة، قوانين طبيعية', color: '#e74c3c' },
+            { id: 'علوم', name: 'العلوم العامة', icon: '🔬', desc: 'أحياء، بيئة، تشريح', color: '#1abc9c' },
+            { id: 'تاريخ', name: 'التاريخ', icon: '🏛️', desc: 'أحداث قديمة، شخصيات، حضارات', color: '#d35400' },
+            { id: 'جغرافيا', name: 'الجغرافيا', icon: '🌍', desc: 'بلدان، عواصم، ظواهر طبيعية', color: '#27ae60' },
+            { id: 'برمجة', name: 'البرمجة', icon: '💻', desc: 'خوارزميات، تقنية، منطق', color: '#34495e' }
+        ];
+
+        // قاعدة الأسئلة (كل سؤال ينتمي لمادة)
         const questionsDB = [
-            // كيمياء
-            { id: 1, text: "ما الرمز الكيميائي للماء؟", options: ["H2O", "CO2", "O2", "NaCl"], correct: 0, subject: "كيمياء", difficulty: "سهل" },
-            { id: 2, text: "ما العنصر الذي رمزه 'O'؟", options: ["ذهب", "أكسجين", "هيدروجين", "نيتروجين"], correct: 1, subject: "كيمياء", difficulty: "سهل" },
-            { id: 3, text: "ما هو الرقم الهيدروجيني للماء النقي؟", options: ["7", "5", "8", "6"], correct: 0, subject: "كيمياء", difficulty: "متوسط" },
-            { id: 4, text: "ما هو أثقل الغازات النبيلة؟", options: ["الهيليوم", "النيون", "الأرجون", "الرادون"], correct: 3, subject: "كيمياء", difficulty: "صعب" },
-            { id: 5, text: "ما الصيغة الكيميائية لحمض الكبريتيك؟", options: ["HCl", "H2SO4", "HNO3", "CH3COOH"], correct: 1, subject: "كيمياء", difficulty: "متوسط" },
-            { id: 6, text: "ما عدد الإلكترونات في ذرة الكربون المستقرة؟", options: ["4", "6", "8", "2"], correct: 1, subject: "كيمياء", difficulty: "صعب" },
             // رياضيات
-            { id: 7, text: "ما ناتج 5 × 6؟", options: ["30", "25", "35", "40"], correct: 0, subject: "رياضيات", difficulty: "سهل" },
-            { id: 8, text: "ما الجذر التربيعي لـ 64؟", options: ["6", "7", "8", "9"], correct: 2, subject: "رياضيات", difficulty: "سهل" },
-            { id: 9, text: "ما قيمة س في المعادلة 2س + 3 = 11؟", options: ["4", "5", "3", "6"], correct: 0, subject: "رياضيات", difficulty: "متوسط" },
-            { id: 10, text: "ما مساحة دائرة نصف قطرها 7 سم (ط ≈ 22/7)؟", options: ["154 سم²", "144 سم²", "164 سم²", "174 سم²"], correct: 0, subject: "رياضيات", difficulty: "متوسط" },
-            { id: 11, text: "إذا كان لدينا مثلث أضلاعه 3، 4، 5، فما نوعه؟", options: ["حاد", "منفرج", "قائم", "متساوي الأضلاع"], correct: 2, subject: "رياضيات", difficulty: "صعب" },
-            { id: 12, text: "ما مشتقة الدالة f(x)=x²؟", options: ["2x", "x", "2", "x²"], correct: 0, subject: "رياضيات", difficulty: "صعب" },
-            // فيزياء
-            { id: 13, text: "ما وحدة قياس القوة؟", options: ["نيوتن", "جول", "واط", "باسكال"], correct: 0, subject: "فيزياء", difficulty: "سهل" },
-            { id: 14, text: "ما هو تسارع الجاذبية الأرضية تقريباً؟", options: ["9.8 م/ث²", "10 م/ث²", "8.9 م/ث²", "11 م/ث²"], correct: 0, subject: "فيزياء", difficulty: "سهل" },
-            { id: 15, text: "قانون أوم ينص على أن الجهد = ...", options: ["التيار × المقاومة", "التيار / المقاومة", "المقاومة / التيار", "التيار + المقاومة"], correct: 0, subject: "فيزياء", difficulty: "متوسط" },
-            { id: 16, text: "ما لون الضوء ذو الطول الموجي الأطول؟", options: ["أحمر", "أزرق", "أخضر", "بنفسجي"], correct: 0, subject: "فيزياء", difficulty: "متوسط" },
-            { id: 17, text: "ما هي نظرية النسبية لأينشتاين؟", options: ["E=mc²", "F=ma", "PV=nRT", "V=IR"], correct: 0, subject: "فيزياء", difficulty: "صعب" },
-            { id: 18, text: "أي الموجات الكهرومغناطيسية تمتلك أعلى طاقة؟", options: ["راديو", "ميكروويف", "أشعة غاما", "ضوء مرئي"], correct: 2, subject: "فيزياء", difficulty: "صعب" },
+            { id: 1, text: "ما ناتج 5 × 6؟", options: ["30", "25", "35", "40"], correct: 0, subject: "رياضيات", difficulty: "سهل" },
+            { id: 2, text: "ما الجذر التربيعي لـ 64؟", options: ["6", "7", "8", "9"], correct: 2, subject: "رياضيات", difficulty: "سهل" },
+            { id: 3, text: "ما قيمة س في المعادلة 2س + 3 = 11؟", options: ["4", "5", "3", "6"], correct: 0, subject: "رياضيات", difficulty: "متوسط" },
+            { id: 4, text: "ما مساحة دائرة نصف قطرها 7 سم (ط ≈ 22/7)؟", options: ["154 سم²", "144 سم²", "164 سم²", "174 سم²"], correct: 0, subject: "رياضيات", difficulty: "متوسط" },
             // لغة عربية
-            { id: 19, text: "ما هو جمع كلمة 'كتاب'؟", options: ["كتب", "كتابة", "أكتب", "كاتب"], correct: 0, subject: "عربية", difficulty: "سهل" },
-            { id: 20, text: "ما هو الفعل الماضي من 'يذهب'؟", options: ["ذهب", "ذاهب", "اذهب", "ذهاب"], correct: 0, subject: "عربية", difficulty: "سهل" },
-            { id: 21, text: "ما إعراب كلمة 'الطالب' في جملة 'الطالب مجتهد'؟", options: ["مبتدأ مرفوع", "خبر مرفوع", "فاعل مرفوع", "مفعول به منصوب"], correct: 0, subject: "عربية", difficulty: "متوسط" },
-            { id: 22, text: "ما هو جمع كلمة 'امرأة'؟", options: ["نساء", "أمرأة", "نسوة", "كلاهما صحيح"], correct: 3, subject: "عربية", difficulty: "متوسط" },
-            { id: 23, text: "من هو قائل قصيدة 'بردى'؟", options: ["نزار قباني", "أحمد شوقي", "المتنبي", "بشار بن برد"], correct: 0, subject: "عربية", difficulty: "صعب" },
-            { id: 24, text: "ما هو المصدر من الفعل 'استغفر'؟", options: ["استغفار", "غفران", "مغفرة", "غفور"], correct: 0, subject: "عربية", difficulty: "صعب" },
+            { id: 5, text: "ما هو جمع كلمة 'كتاب'؟", options: ["كتب", "كتابة", "أكتب", "كاتب"], correct: 0, subject: "عربية", difficulty: "سهل" },
+            { id: 6, text: "ما هو الفعل الماضي من 'يذهب'؟", options: ["ذهب", "ذاهب", "اذهب", "ذهاب"], correct: 0, subject: "عربية", difficulty: "سهل" },
+            { id: 7, text: "ما إعراب كلمة 'الطالب' في جملة 'الطالب مجتهد'؟", options: ["مبتدأ مرفوع", "خبر مرفوع", "فاعل مرفوع", "مفعول به منصوب"], correct: 0, subject: "عربية", difficulty: "متوسط" },
             // إنجليزي
-            { id: 25, text: "What is the past tense of 'go'?", options: ["went", "gone", "goed", "going"], correct: 0, subject: "إنجليزي", difficulty: "سهل" },
-            { id: 26, text: "Which word is a synonym for 'happy'?", options: ["sad", "joyful", "angry", "tired"], correct: 1, subject: "إنجليزي", difficulty: "سهل" },
-            { id: 27, text: "What is the plural of 'child'?", options: ["childs", "children", "childes", "child's"], correct: 1, subject: "إنجليزي", difficulty: "متوسط" },
-            { id: 28, text: "Choose the correct spelling:", options: ["accommodate", "accomodate", "acommodate", "accomoddate"], correct: 0, subject: "إنجليزي", difficulty: "متوسط" },
-            { id: 29, text: "What does 'benevolent' mean?", options: ["kind", "evil", "funny", "sad"], correct: 0, subject: "إنجليزي", difficulty: "صعب" },
-            { id: 30, text: "Who wrote 'Hamlet'?", options: ["Shakespeare", "Dickens", "Hemingway", "Tolkien"], correct: 0, subject: "إنجليزي", difficulty: "صعب" }
+            { id: 8, text: "What is the past tense of 'go'?", options: ["went", "gone", "goed", "going"], correct: 0, subject: "إنجليزي", difficulty: "سهل" },
+            { id: 9, text: "Which word is a synonym for 'happy'?", options: ["sad", "joyful", "angry", "tired"], correct: 1, subject: "إنجليزي", difficulty: "سهل" },
+            // كيمياء
+            { id: 10, text: "ما الرمز الكيميائي للماء؟", options: ["H2O", "CO2", "O2", "NaCl"], correct: 0, subject: "كيمياء", difficulty: "سهل" },
+            { id: 11, text: "ما العنصر الذي رمزه 'O'؟", options: ["ذهب", "أكسجين", "هيدروجين", "نيتروجين"], correct: 1, subject: "كيمياء", difficulty: "سهل" },
+            // فيزياء
+            { id: 12, text: "ما وحدة قياس القوة؟", options: ["نيوتن", "جول", "واط", "باسكال"], correct: 0, subject: "فيزياء", difficulty: "سهل" },
+            // علوم
+            { id: 13, text: "ما أكبر عضو في جسم الإنسان؟", options: ["الجلد", "الكبد", "القلب", "الرئتين"], correct: 0, subject: "علوم", difficulty: "سهل" },
+            { id: 14, text: "ما هو الكوكب الأحمر؟", options: ["المريخ", "الزهرة", "المشتري", "زحل"], correct: 0, subject: "علوم", difficulty: "سهل" },
+            // تاريخ
+            { id: 15, text: "من هو قائد معركة حطين؟", options: ["صلاح الدين", "ريتشارد", "الظاهر بيبرس", "قطز"], correct: 0, subject: "تاريخ", difficulty: "متوسط" },
+            // جغرافيا
+            { id: 16, text: "ما عاصمة فرنسا؟", options: ["باريس", "لندن", "روما", "مدريد"], correct: 0, subject: "جغرافيا", difficulty: "سهل" },
+            // برمجة
+            { id: 17, text: "ما هي اللغة المستخدمة في تصميم صفحات الويب؟", options: ["HTML", "Python", "Java", "C++"], correct: 0, subject: "برمجة", difficulty: "سهل" },
+            { id: 18, text: "ما function في JavaScript تستخدم لطباعة شيء في الكونسول؟", options: ["console.log()", "print()", "echo()", "cout"], correct: 0, subject: "برمجة", difficulty: "متوسط" }
         ];
 
         // ***************************
         // متغيرات اللعبة
         // ***************************
-        let currentQuestions = []; // الأسئلة المتاحة بعد التصفية
+        let currentQuestions = [];
         let currentQuestionIndex = 0;
         let teamAScore = 0;
         let teamBScore = 0;
-        let ropePosition = 50; // نسبة مئوية (0 يعني فوز الفريق ب، 100 يعني فوز الفريق أ)
+        let ropePosition = 50;
         let timerInterval;
         let timeLeft = 60;
         let gameActive = false;
-        let currentMode = "1vCPU"; // 1vCPU, 1v1, team
-        let currentSubject = "all";
+        let currentMode = "1vCPU";
         let currentDifficulty = "all";
-        let currentPlayerTurn = "A"; // لمن يلعب الآن (في وضع 1v1 وفريق)
-        let computerTimeout; // مؤقت الكمبيوتر
-        let questionLock = false; // لمنع الضغط المتكرر
+        let currentSubject = "رياضيات";
+        let currentPlayerTurn = "A";
+        let computerTimeout;
+        let questionLock = false;
 
         // عناصر DOM
-        const subjectSelect = document.getElementById('subjectSelect');
+        const subjectsScreen = document.getElementById('subjectsScreen');
+        const gameArea = document.getElementById('gameArea');
+        const subjectsGrid = document.getElementById('subjectsGrid');
+        const currentSubjectTitle = document.getElementById('currentSubjectTitle');
+        const backToSubjectsBtn = document.getElementById('backToSubjectsBtn');
         const difficultySelect = document.getElementById('difficultySelect');
         const modeSelect = document.getElementById('modeSelect');
         const startBtn = document.getElementById('startGameBtn');
-        const resetBtn = document.getElementById('resetGameBtn');
-        const showResultsBtn = document.getElementById('showResultsBtn');
         const timerDisplay = document.getElementById('timerDisplay');
         const scoreA = document.getElementById('scoreA');
         const scoreB = document.getElementById('scoreB');
@@ -600,19 +663,57 @@
         const closeResultsBtn = document.getElementById('closeResultsBtn');
 
         // ***************************
-        // دوال مساعدة
+        // إنشاء بطاقات المواد
+        // ***************************
+        function buildSubjectsGrid() {
+            subjectsGrid.innerHTML = '';
+            subjectsData.forEach(subj => {
+                const card = document.createElement('div');
+                card.className = 'subject-card';
+                card.style.borderTop = `5px solid ${subj.color}`;
+                card.innerHTML = `
+                    <div class="subject-icon">${subj.icon}</div>
+                    <div class="subject-name">${subj.name}</div>
+                    <div class="subject-desc">${subj.desc}</div>
+                `;
+                card.addEventListener('click', () => selectSubject(subj.id, subj.name));
+                subjectsGrid.appendChild(card);
+            });
+        }
+
+        // اختيار مادة
+        function selectSubject(subjectId, subjectName) {
+            currentSubject = subjectId;
+            currentSubjectTitle.textContent = subjectName;
+            subjectsScreen.style.display = 'none';
+            gameArea.style.display = 'block';
+            resetGame(); // إعادة تعيين اللعبة عند دخول مادة جديدة
+        }
+
+        // العودة لشاشة المواد
+        backToSubjectsBtn.addEventListener('click', () => {
+            gameArea.style.display = 'none';
+            subjectsScreen.style.display = 'block';
+            resetGame();
+        });
+
+        // ***************************
+        // دوال اللعبة (مشتقة من الكود السابق)
         // ***************************
         function filterQuestions() {
             currentQuestions = questionsDB.filter(q => {
-                const subjectMatch = currentSubject === 'all' || q.subject === currentSubject;
+                const subjectMatch = q.subject === currentSubject;
                 const difficultyMatch = currentDifficulty === 'all' || q.difficulty === currentDifficulty;
                 return subjectMatch && difficultyMatch;
             });
             if (currentQuestions.length === 0) {
-                // إذا لم يوجد أسئلة، استخدم كل الأسئلة
-                currentQuestions = [...questionsDB];
+                // إذا لم يوجد أسئلة، استخدم كل الأسئلة الخاصة بالمادة (أو رسالة)
+                currentQuestions = questionsDB.filter(q => q.subject === currentSubject);
+                if (currentQuestions.length === 0) {
+                    // إذا حتى لا يوجد، نضع سؤال افتراضي
+                    currentQuestions = [{ id: 0, text: "لا توجد أسئلة لهذه المادة حالياً", options: ["نعم", "لا", "ربما", "لا أعرف"], correct: 0, subject: currentSubject, difficulty: "سهل" }];
+                }
             }
-            // خلط الأسئلة
             currentQuestions = shuffleArray(currentQuestions);
         }
 
@@ -624,51 +725,31 @@
             return array;
         }
 
-        // تحديث واجهة النتيجة
         function updateScoresUI() {
             scoreA.textContent = teamAScore;
             scoreB.textContent = teamBScore;
         }
 
-        // تحديث الحبل بناءً على النسبة (0-100)
         function updateRope(position) {
-            // تأكد أن position بين 0 و 100
             position = Math.min(100, Math.max(0, position));
             ropeFill.style.width = position + '%';
-            indicator.style.left = `calc(${position}% - 20px)`; // تصحيح موضع المؤشر
-
-            // تحقق من الفوز
-            if (position <= 0) {
-                endGame('B'); // الفريق ب فاز
-            } else if (position >= 100) {
-                endGame('A'); // الفريق أ فاز
-            }
+            indicator.style.left = `calc(${position}% - 20px)`;
+            if (position <= 0) endGame('B');
+            else if (position >= 100) endGame('A');
         }
 
-        // تحريك الحبل بعد الإجابة
         function moveRope(isCorrect, team) {
-            // team: "A" أو "B" (الفريق الذي أجاب)
-            // إذا كانت الإجابة صحيحة، يتحرك الحبل لصالح هذا الفريق، والعكس صحيح
-            let step = 5; // نسبة الحركة
+            let step = 5;
             if (isCorrect) {
-                // إذا كان الفريق أ هو من أجاب، نزيد width (لصالح أ)، وإذا كان ب، نقلل width (لصالح ب)
-                if (team === 'A') {
-                    ropePosition += step;
-                } else {
-                    ropePosition -= step;
-                }
+                if (team === 'A') ropePosition += step;
+                else ropePosition -= step;
             } else {
-                // إجابة خاطئة: تتحرك ضد الفريق الذي أجاب
-                if (team === 'A') {
-                    ropePosition -= step;
-                } else {
-                    ropePosition += step;
-                }
+                if (team === 'A') ropePosition -= step;
+                else ropePosition += step;
             }
             updateRope(ropePosition);
         }
 
-        // دوال المؤثرات الصوتية (باستخدام Web Audio API)
         function playSound(type) {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -690,19 +771,18 @@
                     oscillator.start();
                     oscillator.stop(audioCtx.currentTime + 0.3);
                 }
-            } catch (e) {
-                // المتصفح لا يدعم Web Audio
-                console.log('Web Audio not supported');
-            }
+            } catch (e) {}
         }
 
-        // عرض السؤال الحالي
         function displayQuestion() {
             if (currentQuestions.length === 0 || currentQuestionIndex >= currentQuestions.length) {
-                // إذا نفذت الأسئلة، نخلي المستخدم يبدأ من جديد
-                questionText.textContent = "لقد انتهت الأسئلة! ابدأ جولة جديدة.";
-                optionsContainer.innerHTML = '';
-                return;
+                currentQuestions = shuffleArray(currentQuestions);
+                currentQuestionIndex = 0;
+                if (currentQuestions.length === 0) {
+                    questionText.textContent = "لا توجد أسئلة!";
+                    optionsContainer.innerHTML = '';
+                    return;
+                }
             }
             const q = currentQuestions[currentQuestionIndex];
             questionText.textContent = q.text;
@@ -711,14 +791,11 @@
                 optionsHtml += `<button class="option-btn" data-opt-index="${index}">${opt}</button>`;
             });
             optionsContainer.innerHTML = optionsHtml;
-
-            // إضافة مستمعي الأحداث للأزرار
             document.querySelectorAll('.option-btn').forEach(btn => {
                 btn.addEventListener('click', onAnswerClick);
             });
         }
 
-        // معالج الإجابة
         function onAnswerClick(e) {
             if (!gameActive || questionLock) return;
             const selectedBtn = e.target;
@@ -726,105 +803,64 @@
             const currentQ = currentQuestions[currentQuestionIndex];
             const isCorrect = (selectedIndex === currentQ.correct);
 
-            // تعطيل الأزرار مؤقتاً
             questionLock = true;
             document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
 
-            // تطبيق تأثير بصري
             if (isCorrect) {
                 selectedBtn.classList.add('correct');
                 playSound('correct');
             } else {
                 selectedBtn.classList.add('wrong');
-                // أظهر الإجابة الصحيحة
                 document.querySelectorAll('.option-btn')[currentQ.correct].classList.add('correct');
                 playSound('wrong');
             }
 
-            // تحديد الفريق الحالي حسب وضع اللعب
-            let currentTeam = 'A'; // افتراضي
-            if (currentMode === '1vCPU') {
-                // في هذا الوضع، اللاعب دائماً هو الفريق A، والكمبيوتر B
-                // ولكن يجب معرفة من الذي ضغط: في وضع 1vCPU، اللاعب فقط يضغط، والكمبيوتر لا يضغط على الأزرار
-                // إذن currentTeam = 'A' (اللاعب)
-                currentTeam = 'A';
-            } else if (currentMode === '1v1') {
-                // اللاعبان يتناوبان، currentPlayerTurn يحدد من يلعب الآن
-                currentTeam = currentPlayerTurn;
-                // بعد الإجابة، نبدل الدور
-            } else if (currentMode === 'team') {
-                // الفرق: نفرض أن الفريق أ هو من يلعب الآن، أو حسب الدور. نبسطها: الفريق أ له نصف الوقت والفريق ب له النصف الآخر.
-                // هنا نجعل currentPlayerTurn هو الفريق الحالي
-                currentTeam = currentPlayerTurn;
-            }
+            let currentTeam = 'A';
+            if (currentMode === '1vCPU') currentTeam = 'A';
+            else if (currentMode === '1v1' || currentMode === 'team') currentTeam = currentPlayerTurn;
 
-            // تحريك الحبل
             moveRope(isCorrect, currentTeam);
 
-            // تحديث النقاط (اختياري: نحتفظ بنقاط لكل فريق)
             if (isCorrect) {
                 if (currentTeam === 'A') teamAScore++; else teamBScore++;
-            } else {
-                // يمكن إضافة نقاط سلبية أو لا
             }
             updateScoresUI();
 
-            // الانتقال إلى السؤال التالي بعد ثانية
             setTimeout(() => {
-                // إعادة تعيين الأزرار
                 document.querySelectorAll('.option-btn').forEach(btn => {
                     btn.disabled = false;
                     btn.classList.remove('correct', 'wrong');
                 });
-
-                // الانتقال للسؤال التالي
                 currentQuestionIndex++;
-                if (currentQuestionIndex < currentQuestions.length) {
-                    displayQuestion();
-                } else {
-                    // خلط الأسئلة وإعادة البدء (إذا استمرت اللعبة)
-                    currentQuestions = shuffleArray(currentQuestions);
-                    currentQuestionIndex = 0;
-                    displayQuestion();
-                }
-
+                displayQuestion();
                 questionLock = false;
 
-                // إذا كان وضع 1v1 أو فريق، نبدل الدور
                 if (currentMode === '1v1' || currentMode === 'team') {
                     currentPlayerTurn = (currentPlayerTurn === 'A' ? 'B' : 'A');
                 }
 
-                // إذا كان وضع لاعب ضد الكمبيوتر، وبعد أن يجيب اللاعب، نقوم بتشغيل الكمبيوتر بعد تأخير
                 if (currentMode === '1vCPU' && gameActive) {
-                    // تأكد أن اللعبة لا تزال نشطة وأنه ليس دور الكمبيوتر الآن (الكمبيوتر يلعب تلقائياً)
                     scheduleComputerAnswer();
                 }
             }, 1000);
         }
 
-        // دالة لمحاكاة إجابة الكمبيوتر (وضع 1vCPU)
         function scheduleComputerAnswer() {
             if (computerTimeout) clearTimeout(computerTimeout);
             computerTimeout = setTimeout(() => {
                 if (!gameActive || questionLock) return;
-
-                // الكمبيوتر يجيب بشكل عشوائي (يمكن تحسينه ليكون نسبة ذكاء)
                 const currentQ = currentQuestions[currentQuestionIndex];
+                if (!currentQ) return;
                 const correctIndex = currentQ.correct;
-                // احتمالية 70% للإجابة الصحيحة في المستوى السهل، 50% متوسط، 30% صعب
                 let correctProb = 0.7;
                 if (currentDifficulty === 'متوسط') correctProb = 0.5;
                 else if (currentDifficulty === 'صعب') correctProb = 0.3;
-
                 const isComputerCorrect = Math.random() < correctProb;
                 const selectedIndex = isComputerCorrect ? correctIndex : Math.floor(Math.random() * 4);
 
-                // تعطيل الأزرار
                 questionLock = true;
                 document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
 
-                // تأثير بصري
                 if (isComputerCorrect) {
                     document.querySelectorAll('.option-btn')[correctIndex].classList.add('correct');
                     playSound('correct');
@@ -834,9 +870,8 @@
                     playSound('wrong');
                 }
 
-                // الفريق B (الكمبيوتر) هو من أجاب
                 moveRope(isComputerCorrect, 'B');
-                if (isComputerCorrect) teamBScore++; else teamAScore++; // إذا أخطأ الكمبيوتر، نحتسب للفريق أ؟
+                if (isComputerCorrect) teamBScore++; else teamAScore++;
                 updateScoresUI();
 
                 setTimeout(() => {
@@ -845,32 +880,22 @@
                         btn.classList.remove('correct', 'wrong');
                     });
                     currentQuestionIndex++;
-                    if (currentQuestionIndex < currentQuestions.length) {
-                        displayQuestion();
-                    } else {
-                        currentQuestions = shuffleArray(currentQuestions);
-                        currentQuestionIndex = 0;
-                        displayQuestion();
-                    }
+                    displayQuestion();
                     questionLock = false;
                 }, 1000);
-            }, 3000); // الكمبيوتر يفكر 3 ثوان
+            }, 3000);
         }
 
-        // بدء الموقت
         function startTimer() {
             timeLeft = 60;
             timerDisplay.textContent = timeLeft;
             timerInterval = setInterval(() => {
                 timeLeft--;
                 timerDisplay.textContent = timeLeft;
-                if (timeLeft <= 0) {
-                    endGame('timeout');
-                }
+                if (timeLeft <= 0) endGame('timeout');
             }, 1000);
         }
 
-        // إنهاء اللعبة
         function endGame(winner) {
             if (!gameActive) return;
             gameActive = false;
@@ -883,10 +908,7 @@
             else if (winner === 'B') winnerName = 'الفريق ب';
             else winnerName = 'لا أحد (انتهى الوقت)';
 
-            // حفظ النتيجة في localStorage
             saveResult(winnerName, teamAScore, teamBScore);
-
-            // عرض شاشة النتائج
             resultsDetails.innerHTML = `
                 <p>🏅 الفائز: ${winnerName}</p>
                 <p>الفريق أ: ${teamAScore} نقطة</p>
@@ -895,11 +917,11 @@
             resultsScreen.style.display = 'flex';
         }
 
-        // حفظ النتائج في LocalStorage
         function saveResult(winner, scoreA, scoreB) {
             let results = JSON.parse(localStorage.getItem('tugOfWarResults')) || [];
             results.push({
                 date: new Date().toLocaleString('ar-EG'),
+                subject: currentSubject,
                 winner: winner,
                 scoreA: scoreA,
                 scoreB: scoreB
@@ -907,22 +929,6 @@
             localStorage.setItem('tugOfWarResults', JSON.stringify(results));
         }
 
-        // عرض النتائج المحفوظة
-        function showSavedResults() {
-            let results = JSON.parse(localStorage.getItem('tugOfWarResults')) || [];
-            if (results.length === 0) {
-                resultsDetails.innerHTML = '<p>لا توجد نتائج محفوظة بعد.</p>';
-            } else {
-                let html = '';
-                results.slice(-5).reverse().forEach(r => {
-                    html += `<p>${r.date} - الفائز: ${r.winner} (${r.scoreA}-${r.scoreB})</p>`;
-                });
-                resultsDetails.innerHTML = html;
-            }
-            resultsScreen.style.display = 'flex';
-        }
-
-        // إعادة تعيين اللعبة
         function resetGame() {
             gameActive = false;
             clearInterval(timerInterval);
@@ -939,47 +945,32 @@
             questionLock = false;
         }
 
-        // بدء اللعبة
         function startGame() {
-            resetGame(); // إعادة تعيين أولاً
-
-            // قراءة الإعدادات
-            currentSubject = subjectSelect.value;
+            resetGame();
             currentDifficulty = difficultySelect.value;
             currentMode = modeSelect.value;
-
-            // تصفية الأسئلة
             filterQuestions();
             currentQuestionIndex = 0;
             displayQuestion();
-
-            // إظهار منطقة السؤال
             questionArea.style.display = 'block';
-
-            // تفعيل اللعبة
             gameActive = true;
             startTimer();
-
-            // إذا كان وضع لاعب ضد الكمبيوتر، نبدأ مع اللاعب (دور A) ثم الكمبيوتر سيلعب بعد الإجابة
             if (currentMode === '1vCPU') {
-                // لا تفعل شيئاً خاصاً، اللاعب سيضغط أولاً
+                // لا شيء، اللاعب سيبدأ
             } else if (currentMode === '1v1' || currentMode === 'team') {
-                currentPlayerTurn = 'A'; // ابدأ مع الفريق أ
+                currentPlayerTurn = 'A';
             }
         }
 
         // أحداث
         startBtn.addEventListener('click', startGame);
-        resetBtn.addEventListener('click', resetGame);
-        showResultsBtn.addEventListener('click', showSavedResults);
         closeResultsBtn.addEventListener('click', () => {
             resultsScreen.style.display = 'none';
         });
 
-        // بداية: عرض بعض الأسئلة عند التحميل (اختياري)
+        // عند تحميل الصفحة، نبني شبكة المواد
         window.onload = function() {
-            filterQuestions();
-            // لا نبدأ اللعبة تلقائياً
+            buildSubjectsGrid();
         };
     </script>
 </body>
